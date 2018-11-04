@@ -68,9 +68,6 @@ public class Referee extends AbstractReferee {
             			.setX(WIDTH/4 + 2*(player.getIndex())*WIDTH/4 )
 						.setY(3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4)
             			.setFillColor(0x00FF00);
-            
-         
-            
 
         }
         
@@ -154,6 +151,7 @@ public class Referee extends AbstractReferee {
         
         
         // Send inputs
+        //todo set player positions
         for (int l = 0; l < 3; l++) {
             player.sendInputLine(String.format("%d %d %d", grid[l][0], grid[l][1], grid[l][2]));
         }
@@ -168,6 +166,7 @@ public class Referee extends AbstractReferee {
         
         
         // Read inputs
+        //todo send player positions
         try {
             String[] output = player.getOutputs().get(0).split(" ");
             int targetRow = Integer.parseInt(output[0]);
@@ -214,9 +213,12 @@ public class Referee extends AbstractReferee {
             gameManager.endGame();
         }
         
+        //TODO
+        //animate Bullets
         drawBullets();
 
-        
+        //TODO
+        //animate players
         
 
         // check winner
@@ -233,7 +235,6 @@ public class Referee extends AbstractReferee {
 	private void drawBullets() {
 		
         for(Bullet b: bullets){
-            //TODO
             graphicEntityModule.createSprite()
             .setX((int) b.x)
             .setY((int) b.y)
