@@ -74,7 +74,7 @@ public class Referee extends AbstractReferee {
 
         gameManager.setFrameDuration(500);
 
-        drawGrid();
+       // drawGrid();
 
         return params;
     }
@@ -106,14 +106,14 @@ public class Referee extends AbstractReferee {
     }
 
     private void drawVictoryLine(int row1, int col1, int row2, int col2, Player winner) {
-        graphicEntityModule.createLine()
-                .setX(convertX(col1))
-                .setY(convertY(row1))
-                .setX2(convertX(col2))
-                .setY2(convertY(row2))
-                .setLineWidth(LINE_WIDTH)
-                .setLineColor(winner.getColorToken())
-                .setZIndex(30);
+//        graphicEntityModule.createLine()
+//                .setX(convertX(col1))
+//                .setY(convertY(row1))
+//                .setX2(convertX(col2))
+//                .setY2(convertY(row2))
+//                .setLineWidth(LINE_WIDTH)
+//                .setLineColor(winner.getColorToken())
+//                .setZIndex(30);
     }
 
     private int checkWinner() {
@@ -181,19 +181,6 @@ public class Referee extends AbstractReferee {
                 player.setScore(-1);
                 gameManager.endGame();
             } else {
-                Sprite avatar = graphicEntityModule.createSprite()
-                        .setX(convertX(targetCol))
-                        .setY(convertY(targetRow))
-                        .setImage(player.getAvatarToken())
-                        .setAnchor(0.5);
-                
-                // Animate arrival
-                avatar.setScale(0);
-                graphicEntityModule.commitEntityState(0, avatar);
-                avatar.setScale(1, Curve.ELASTIC);
-                graphicEntityModule.commitEntityState(1, avatar);
-                
-
                 
             }
 
@@ -235,12 +222,19 @@ public class Referee extends AbstractReferee {
 	private void drawBullets() {
 		
         for(Bullet b: bullets){
-            graphicEntityModule.createSprite()
+            Sprite s = graphicEntityModule.createSprite()
             .setX((int) b.x)
             .setY((int) b.y)
             .setImage("test.png")
             .setAnchor(0.5);  
             
+            graphicEntityModule.commitEntityState(0, s);
+            s.setX(100+(int) b.x)
+            .setY(150+(int) b.y)
+            .setImage("test.png")
+            .setAnchor(0.5); 
+            graphicEntityModule.commitEntityState(1, s);
+
         }		
 	}
 }
