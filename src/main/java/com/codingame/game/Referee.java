@@ -15,6 +15,10 @@ import com.codingame.gameengine.module.entities.Sprite;
 import com.google.inject.Inject;
 
 import pojo.Bullet;
+import pojo.Constants;
+import pojo.Point;
+import pojo.Unit;
+import pojo.Utils;
 
 public class Referee extends AbstractReferee {
     @Inject private GameManager<Player> gameManager;
@@ -22,6 +26,9 @@ public class Referee extends AbstractReferee {
     private int[][] grid = new int[3][3];
 
     private List<Bullet> bullets = new ArrayList<Bullet>();
+    private List<Sprite> bulletsSprites = new ArrayList<Sprite>();
+    private Sprite[] playersSprites = new Sprite[Constants.NUMBER_OF_PLAYERS];
+    private Unit[] players = new Unit[Constants.NUMBER_OF_PLAYERS];
     
     private static final int CELL_SIZE = 250;
     private static final int LINE_WIDTH = 10;
@@ -42,6 +49,7 @@ public class Referee extends AbstractReferee {
         Random r = new Random();
         	
         for (Player player : gameManager.getPlayers()) {
+        	//expose avatars 
             player.sendInputLine(String.format("%d", player.getIndex() + 1));
             graphicEntityModule.createText(player.getNicknameToken())
                     .setX(180 + (player.getIndex() % 2) * 1400)
@@ -50,31 +58,23 @@ public class Referee extends AbstractReferee {
                     .setFontSize(90)
                     .setFillColor(player.getColorToken())
                     .setAnchor(0);
-
-            graphicEntityModule.createSprite()
-                    .setX(100 + (player.getIndex() % 2) * 1400)
-                    .setY(90 + 100 * (player.getIndex() / 2))
+            
+            //create units
+            players[player.getIndex()] = new Unit(player.getIndex(), WIDTH/4 + 2*(player.getIndex())*WIDTH/4,3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4,0,0,Constants.PLAYER_AMORT);
+            
+            //create player sprite
+            Sprite s = graphicEntityModule.createSprite()
+			.setX(WIDTH/4 + 2*(player.getIndex())*WIDTH/4 )
+			.setY(3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4)
                     .setZIndex(20)
-                    .setImage(player.getAvatarToken())
+                    .setImage("test.png")
                     .setAnchor(0.5);
-//                    .setBaseHeight(116)
-//                    .setBaseWidth(116);
+            playersSprites[player.getIndex()] = s;
             
-            
-         // Creates a green circle
-            Circle circle = graphicEntityModule.createCircle()
-            			.setRadius(100)
-            			.setLineWidth(30+r.nextInt(5))
-            			.setX(WIDTH/4 + 2*(player.getIndex())*WIDTH/4 )
-						.setY(3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4)
-            			.setFillColor(0x00FF00);
-
         }
         
 
         gameManager.setFrameDuration(500);
-
-       // drawGrid();
 
         return params;
     }
@@ -105,39 +105,24 @@ public class Referee extends AbstractReferee {
 
     }
 
-    private void drawVictoryLine(int row1, int col1, int row2, int col2, Player winner) {
-//        graphicEntityModule.createLine()
-//                .setX(convertX(col1))
-//                .setY(convertY(row1))
-//                .setX2(convertX(col2))
-//                .setY2(convertY(row2))
-//                .setLineWidth(LINE_WIDTH)
-//                .setLineColor(winner.getColorToken())
-//                .setZIndex(30);
-    }
-
     private int checkWinner() {
         for (int i = 0; i < 3; i++) {
             // check rows
             if (grid[i][0] > 0 && grid[i][0] == grid[i][1] && grid[i][0] == grid[i][2]) {
-                drawVictoryLine(i, 0, i, 2, gameManager.getPlayer(grid[i][0] - 1));
                 return grid[i][0];
             }
 
             // check cols
             if (grid[0][i] > 0 && grid[0][i] == grid[1][i] && grid[0][i] == grid[2][i]) {
-                drawVictoryLine(0, i, 2, i, gameManager.getPlayer(grid[0][i] - 1));
                 return grid[0][i];
             }
         }
 
         // check diags
         if (grid[0][0] > 0 && grid[0][0] == grid[1][1] && grid[0][0] == grid[2][2]) {
-            drawVictoryLine(0, 0, 2, 2, gameManager.getPlayer(grid[0][0] - 1));
             return grid[0][0];
         }
         if (grid[2][0] > 0 && grid[2][0] == grid[1][1] && grid[2][0] == grid[0][2]) {
-            drawVictoryLine(2, 0, 0, 2, gameManager.getPlayer(grid[1][1] - 1));
             return grid[2][0];
         }
 
@@ -148,22 +133,25 @@ public class Referee extends AbstractReferee {
     public void gameTurn(int turn) {
         Player player = gameManager.getPlayer(turn % gameManager.getPlayerCount());
 
-        
-        
-        // Send inputs
-        //todo set player positions
+        // Send grid inputs
         for (int l = 0; l < 3; l++) {
             player.sendInputLine(String.format("%d %d %d", grid[l][0], grid[l][1], grid[l][2]));
         }
+        
+        //send players inputs
+        player.sendInputLine(String.format("%d", Constants.NUMBER_OF_PLAYERS));
+        Unit unit= players[turn % gameManager.getPlayerCount()];
+        player.sendInputLine(String.format("%d %d %d %d",(int)unit.x, (int)unit.y, (int)unit.vx, (int)unit.vy));
+        Unit enemy= players[gameManager.getPlayerCount()-1-turn % gameManager.getPlayerCount()];
+        player.sendInputLine(String.format("%d %d %d %d",(int)enemy.x, (int)enemy.y, (int)enemy.vx, (int)enemy.vy));
+        
+        //send bullets inputs
         player.sendInputLine(String.format("%d", bullets.size()));
         for(Bullet b : bullets){
-//        	 System.err.println(String.format("%d %d %d %d", (int)b.x, (int)b.y, (int)b.vx, (int)b.vy));
         	player.sendInputLine(String.format("%d %d %d %d", (int)b.x, (int)b.y, (int)b.vx, (int)b.vy));
         }
+        
         player.execute();
-
-        
-        
         
         // Read inputs
         //todo send player positions
@@ -174,8 +162,12 @@ public class Referee extends AbstractReferee {
             
             int targetShootX = Integer.parseInt(output[2]);
             int targetShootY = Integer.parseInt(output[3]);
-            bullets.add(new Bullet(targetShootX, targetShootY, 20, 20));
-
+            Bullet b = new Bullet(bullets.size(),(int)unit.x, (int)unit.y, 20, 20);
+            Point target = new Point(targetShootX , targetShootY);
+            Utils.aim(b, new Point(targetShootX , targetShootY),100.0);
+            bullets.add(b);
+            draw(b,target);
+            
             if (targetRow < 0 || targetRow >= 3 || targetCol < 0 || targetCol >= 3 || grid[targetRow][targetCol] != 0) {
                 player.deactivate("Invalid action.");
                 player.setScore(-1);
@@ -202,6 +194,7 @@ public class Referee extends AbstractReferee {
         
         //TODO
         //animate Bullets
+        moveBullets();
         drawBullets();
 
         //TODO
@@ -212,29 +205,45 @@ public class Referee extends AbstractReferee {
         int winner = checkWinner();
         if (winner > 0) {
             gameManager.addToGameSummary(GameManager.formatSuccessMessage(player.getNicknameToken() + " won!"));
-
             gameManager.getPlayer(winner - 1).setScore(1);
             gameManager.endGame();
         }
         
     }
 
+	private void draw(Bullet b, Point target) {
+		double angle = Utils.angle(b, target);
+        Sprite s = graphicEntityModule.createSprite()
+        .setX((int) b.x)
+        .setY((int) b.y)
+        .setImage("bullet.png")
+        .setRotation(angle)
+        .setAnchor(0.5);  
+        bulletsSprites.add(s);
+	}
+
 	private void drawBullets() {
 		
-        for(Bullet b: bullets){
-            Sprite s = graphicEntityModule.createSprite()
-            .setX((int) b.x)
-            .setY((int) b.y)
-            .setImage("test.png")
-            .setAnchor(0.5);  
-            
+		for(int i=0; i< bullets.size(); i++){
+        	Sprite s = bulletsSprites.get(i);
+        	Bullet b = bullets.get(i);
             graphicEntityModule.commitEntityState(0, s);
-            s.setX(100+(int) b.x)
-            .setY(150+(int) b.y)
-            .setImage("test.png")
+            s.setX( (int) b.x)
+            .setY( (int) b.y)
+            .setImage("bullet.png")
             .setAnchor(0.5); 
             graphicEntityModule.commitEntityState(1, s);
-
         }		
+		
 	}
+	
+	private void moveBullets() {
+		for(Bullet b : bullets){
+			b.move(1.0);
+			b.end();
+		}
+	}
+	
+	 
+    
 }

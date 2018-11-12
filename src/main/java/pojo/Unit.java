@@ -1,19 +1,19 @@
 package pojo;
 
-public class Unit {
+public class Unit extends Point{
 	
-	public double x;
-	public double y;
+	int id;
 	public double vx;
 	public double vy;
 	public double r=50.0;
+	public double f;
 	
-	public Unit(int x, int y, int vx, int vy) {
-		super();
-		this.x = x;
-		this.y = y;
+	public Unit(int id, int x, int y, int vx, int vy, double f) {
+		super(x,y);
+		this.id=id;
 		this.vx = vx;
 		this.vy = vy;
+		this.f=f;
 	}
 	
 	public void move(double t){
@@ -21,9 +21,16 @@ public class Unit {
 		y+=t*vy;
 	}
 	
+	public void thrust(double angle, int thrust){
+		vx+=thrust*Math.cos(angle);
+		vy+=thrust*Math.sin(angle);
+	}
+	
 	public void end(){
 		x = (int)Math.round(x);
 		y = (int)Math.round(y);
+		vx = (int)Math.round(f*vx);
+		vy = (int)Math.round(f*vy);
 	}
 	
 	
