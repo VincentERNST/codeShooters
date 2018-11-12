@@ -23,7 +23,6 @@ import pojo.Utils;
 public class Referee extends AbstractReferee {
     @Inject private GameManager<Player> gameManager;
     @Inject private GraphicEntityModule graphicEntityModule;
-    private int[][] grid = new int[3][3];
 
     private List<Bullet> bullets = new ArrayList<Bullet>();
     private List<Sprite> bulletsSprites = new ArrayList<Sprite>();
@@ -58,7 +57,15 @@ public class Referee extends AbstractReferee {
                     .setFontSize(90)
                     .setFillColor(player.getColorToken())
                     .setAnchor(0);
-            
+
+            graphicEntityModule.createSprite()
+                    .setX(100 + (player.getIndex() % 2) * 1400)
+                    .setY(90 + 100 * (player.getIndex() / 2))
+                    .setZIndex(20)
+                    .setImage(player.getAvatarToken())
+                    .setAnchor(0.5);
+//                    .setBaseHeight(116)
+//                    .setBaseWidth(116);
             //create units
             players[player.getIndex()] = new Unit(player.getIndex(), WIDTH/4 + 2*(player.getIndex())*WIDTH/4,3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4,0,0,Constants.PLAYER_AMORT);
             
@@ -67,8 +74,10 @@ public class Referee extends AbstractReferee {
 			.setX(WIDTH/4 + 2*(player.getIndex())*WIDTH/4 )
 			.setY(3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4)
                     .setZIndex(20)
-                    .setImage("test.png")
                     .setAnchor(0.5);
+            
+            if(player.getIndex() ==1) {s.setImage("pitlord.jpg");}
+            else{ s.setImage("test.png");}
             playersSprites[player.getIndex()] = s;
             
         }
@@ -106,39 +115,16 @@ public class Referee extends AbstractReferee {
     }
 
     private int checkWinner() {
-        for (int i = 0; i < 3; i++) {
-            // check rows
-            if (grid[i][0] > 0 && grid[i][0] == grid[i][1] && grid[i][0] == grid[i][2]) {
-                return grid[i][0];
-            }
-
-            // check cols
-            if (grid[0][i] > 0 && grid[0][i] == grid[1][i] && grid[0][i] == grid[2][i]) {
-                return grid[0][i];
-            }
-        }
-
-        // check diags
-        if (grid[0][0] > 0 && grid[0][0] == grid[1][1] && grid[0][0] == grid[2][2]) {
-            return grid[0][0];
-        }
-        if (grid[2][0] > 0 && grid[2][0] == grid[1][1] && grid[2][0] == grid[0][2]) {
-            return grid[2][0];
-        }
-
-        return 0;
+    	return 0;
     }
 
     @Override
     public void gameTurn(int turn) {
-        Player player = gameManager.getPlayer(turn % gameManager.getPlayerCount());
-
-        // Send grid inputs
-        for (int l = 0; l < 3; l++) {
-            player.sendInputLine(String.format("%d %d %d", grid[l][0], grid[l][1], grid[l][2]));
-        }
-        
+    	//turn from 0 to end
+    	
+    	
         //send players inputs
+    	Player player = gameManager.getPlayer(turn % gameManager.getPlayerCount());
         player.sendInputLine(String.format("%d", Constants.NUMBER_OF_PLAYERS));
         Unit unit= players[turn % gameManager.getPlayerCount()];
         player.sendInputLine(String.format("%d %d %d %d",(int)unit.x, (int)unit.y, (int)unit.vx, (int)unit.vy));
@@ -157,29 +143,16 @@ public class Referee extends AbstractReferee {
         //todo send player positions
         try {
             String[] output = player.getOutputs().get(0).split(" ");
-            int targetRow = Integer.parseInt(output[0]);
-            int targetCol = Integer.parseInt(output[1]);
             
-            int targetShootX = Integer.parseInt(output[2]);
-            int targetShootY = Integer.parseInt(output[3]);
+            int targetShootX = Integer.parseInt(output[0]);
+            int targetShootY = Integer.parseInt(output[1]);
             Bullet b = new Bullet(bullets.size(),(int)unit.x, (int)unit.y, 20, 20);
             Point target = new Point(targetShootX , targetShootY);
-            Utils.aim(b, new Point(targetShootX , targetShootY),100.0);
+            Utils.aim(b, new Point(targetShootX , targetShootY),200.0);
             bullets.add(b);
             draw(b,target);
             
-            if (targetRow < 0 || targetRow >= 3 || targetCol < 0 || targetCol >= 3 || grid[targetRow][targetCol] != 0) {
-                player.deactivate("Invalid action.");
-                player.setScore(-1);
-                gameManager.endGame();
-            } else {
-                
-            }
-
-            gameManager.addToGameSummary(String.format("Player %s played (%d %d)", player.getNicknameToken(), targetRow, targetCol));
-
-            // update grid
-            grid[targetRow][targetCol] = player.getIndex() + 1;
+            gameManager.addToGameSummary(String.format("Player %s played shoot (%d %d) ", player.getNicknameToken(), targetShootX, targetShootY));
 
         } catch (NumberFormatException e) {
             player.deactivate("Wrong output!");
@@ -203,10 +176,18 @@ public class Referee extends AbstractReferee {
 
         // check winner
         int winner = checkWinner();
-        if (winner > 0) {
+        if (winner > 0 ) {
             gameManager.addToGameSummary(GameManager.formatSuccessMessage(player.getNicknameToken() + " won!"));
             gameManager.getPlayer(winner - 1).setScore(1);
             gameManager.endGame();
+        }
+        //check tie
+        if( turn > 15) {
+        	gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
+        	//TODO tie breaker
+        	gameManager.getPlayer(0).setScore(1);
+        	gameManager.getPlayer(1).setScore(1);
+        	gameManager.endGame();
         }
         
     }
