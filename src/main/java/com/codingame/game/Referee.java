@@ -29,13 +29,8 @@ public class Referee extends AbstractReferee {
     private Sprite[] playersSprites = new Sprite[Constants.NUMBER_OF_PLAYERS];
     private Unit[] players = new Unit[Constants.NUMBER_OF_PLAYERS];
     
-    private static final int CELL_SIZE = 250;
-    private static final int LINE_WIDTH = 10;
-    private static final int LINE_COLOR = 0xff0000;
     private static final int WIDTH = 1920;
     private static final int HEIGHT = 1080;
-    private static final int GRID_ORIGIN_Y = (int) Math.round(1080 / 2 - CELL_SIZE);
-    private static final int GRID_ORIGIN_X = (int) Math.round(1920 / 2 - CELL_SIZE);
 
     @Override
     public Properties init(Properties params) {
@@ -64,8 +59,7 @@ public class Referee extends AbstractReferee {
                     .setZIndex(20)
                     .setImage(player.getAvatarToken())
                     .setAnchor(0.5);
-//                    .setBaseHeight(116)
-//                    .setBaseWidth(116);
+
             //create units
             players[player.getIndex()] = new Unit(player.getIndex(), WIDTH/4 + 2*(player.getIndex())*WIDTH/4,3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4,0,0,Constants.PLAYER_AMORT);
             
@@ -76,7 +70,7 @@ public class Referee extends AbstractReferee {
                     .setZIndex(20)
                     .setAnchor(0.5);
             
-            if(player.getIndex() ==1) {s.setImage("pitlord.jpg");}
+            if(player.getIndex() ==1) {s.setImage("pitlord.jpg");}//player2 img
             else{ s.setImage("test.png");}
             playersSprites[player.getIndex()] = s;
             
@@ -88,32 +82,6 @@ public class Referee extends AbstractReferee {
         return params;
     }
 
-    private int convertX(double unit) {
-        return (int) (GRID_ORIGIN_X + unit * CELL_SIZE);
-    }
-
-    private int convertY(double unit) {
-        return (int) (GRID_ORIGIN_Y + unit * CELL_SIZE);
-    }
-
-    private void drawGrid() {
-        double xs[] = new double[] { 0, 0, 1, 2 };
-        double x2s[] = new double[] { 2, 2, 0, 1 };
-        double ys[] = new double[] { 1, 2, 0, 0 };
-        double y2s[] = new double[] { 0, 1, 2, 2 };
-
-        for (int i = 0; i < 4; ++i) {
-            graphicEntityModule.createLine()
-                    .setX(convertX(xs[i] - 0.5))
-                    .setX2(convertX(x2s[i] + 0.5))
-                    .setY(convertY(ys[i] - 0.5))
-                    .setY2(convertY(y2s[i] + 0.5))
-                    .setLineWidth(LINE_WIDTH)
-                    .setLineColor(LINE_COLOR);
-        }
-
-    }
-
     private int checkWinner() {
     	return 0;
     }
@@ -121,7 +89,6 @@ public class Referee extends AbstractReferee {
     @Override
     public void gameTurn(int turn) {
     	//turn from 0 to end
-    	
     	
         //send players inputs
     	Player player = gameManager.getPlayer(turn % gameManager.getPlayerCount());
@@ -148,7 +115,7 @@ public class Referee extends AbstractReferee {
             int targetShootY = Integer.parseInt(output[1]);
             Bullet b = new Bullet(bullets.size(),(int)unit.x, (int)unit.y, 20, 20);
             Point target = new Point(targetShootX , targetShootY);
-            Utils.aim(b, new Point(targetShootX , targetShootY),200.0);
+            Utils.aim(b, new Point(targetShootX , targetShootY),300.0);
             bullets.add(b);
             draw(b,target);
             
@@ -168,7 +135,7 @@ public class Referee extends AbstractReferee {
         //TODO
         //animate Bullets
         moveBullets();
-        drawBullets();
+        //drawBullets();
 
         //TODO
         //animate players
@@ -220,9 +187,59 @@ public class Referee extends AbstractReferee {
 	
 	private void moveBullets() {
 		for(Bullet b : bullets){
-			b.move(1.0);
-			b.end();
+			
+			Sprite s = bulletsSprites.get(b.id);
+			graphicEntityModule.commitEntityState(0, s);
+			
+				double ty0 = b.vy==0 ? 10.0 : b.y /-b.vy ;
+				double ty1 = b.vy==0 ? 10.0 : (1080 - b.y) /b.vy ;
+				
+				double tx0 = b.vx==0 ? 10.0 : b.x /-b.vx ;
+				double tx1 = b.vx==0 ? 10.0 : (1920 - b.x) /b.vx ;
+				
+				if(ty0 < 1.0 && ty0>0) {
+					bounce(b,s,Constants.VERTICAL,ty0);
+				}
+				else if(ty1 < 1.0 && ty1>0) {
+					bounce(b,s,Constants.VERTICAL,ty1);
+				}
+				else if(tx0 < 1.0 && tx0>0 ) {
+					bounce(b,s,Constants.HORIZONTAL,tx0);
+				}
+				else if(tx1 < 1.0 && tx1>0) {
+					bounce(b,s,Constants.HORIZONTAL,tx1);
+				}
+				else {
+					b.move(1.0);
+					b.end();
+		            s.setX( (int) b.x)
+		            .setY( (int) b.y)
+		            .setImage("bullet.png")
+		            .setAnchor(0.5); 
+		            graphicEntityModule.commitEntityState(1, s); 
+				}
 		}
+	}
+
+	private void bounce(Bullet b,Sprite s, int direction, double t) {
+		 
+		b.move(t);
+		b.end();
+		if(direction == Constants.HORIZONTAL) {b.vx=-b.vx;}
+		if(direction == Constants.VERTICAL) {b.vy=-b.vy;}
+		
+		s.setX( (int) b.x)
+		.setY( (int) b.y)
+		.setImage("bullet.png")
+		.setAnchor(0.5); 
+		graphicEntityModule.commitEntityState(t, s);
+		
+		b.move(1.0-t);
+		s.setX( (int) b.x)
+		.setY( (int) b.y)
+		.setImage("bullet.png")
+		.setAnchor(0.5); 
+		graphicEntityModule.commitEntityState(1, s); 
 	}
 	
 	 

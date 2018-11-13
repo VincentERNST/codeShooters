@@ -2,7 +2,7 @@ package pojo;
 
 public class Unit extends Point{
 	
-	int id;
+	public int id;
 	public double vx;
 	public double vy;
 	public double r=50.0;
