@@ -36,7 +36,7 @@ public class Player1 {
              int  x = random.nextInt(1920);
              int  y = random.nextInt(1080);
 
-            System.out.println(String.format("%d %d",x ,y ));
+            System.out.println(String.format("MOVE %d %d;SHOOT %d %d;",1 ,1,x,y ));
         }
     }
 }

@@ -109,24 +109,51 @@ public class Referee extends AbstractReferee {
         // Read inputs
         //todo send player positions
         try {
-            String[] output = player.getOutputs().get(0).split(" ");
+            String[] output = player.getOutputs().get(0).split(";");
             
-            int targetShootX = Integer.parseInt(output[0]);
-            int targetShootY = Integer.parseInt(output[1]);
-            Bullet b = new Bullet(bullets.size(),(int)unit.x, (int)unit.y, 20, 20);
-            Point target = new Point(targetShootX , targetShootY);
-            Utils.aim(b, new Point(targetShootX , targetShootY),300.0);
-            bullets.add(b);
-            draw(b,target);
+            //move
+            String move = output[0];
+            if(move.equals("WAIT")){
+            	gameManager.addToGameSummary(String.format("Player %s is waiting ", player.getNicknameToken()));
+            }
+			else if (move.split(" ")[0].equals("MOVE")) {
+				int targetMoveX = Integer.parseInt(move.split(" ")[1]);
+				int targetMoveY = Integer.parseInt(move.split(" ")[2]);
+				gameManager.addToGameSummary(String.format("Player %s played Move (%d %d) ", player.getNicknameToken(),targetMoveX,targetMoveY));
+			}
+			else{
+				throw new Exception(" MOVE command is not properly set");
+			}      
             
-            gameManager.addToGameSummary(String.format("Player %s played shoot (%d %d) ", player.getNicknameToken(), targetShootX, targetShootY));
-
+            //shoot
+            String shoot = output[1];
+			if (shoot.split(" ")[0].equals("SHOOT")) {
+				int targetShootX = Integer.parseInt(shoot.split(" ")[1]);
+				int targetShootY = Integer.parseInt(shoot.split(" ")[2]);
+				gameManager.addToGameSummary(String.format("Player %s played shoot (%d %d) ", player.getNicknameToken(), targetShootX, targetShootY));
+				
+	            Bullet b = new Bullet(bullets.size(),(int)unit.x, (int)unit.y, 20, 20);
+	            Point target = new Point(targetShootX , targetShootY);
+	            Utils.aim(b, new Point(targetShootX , targetShootY),300.0);
+	            bullets.add(b);
+	            draw(b,target);
+			}
+			else{
+				throw new Exception(" SHOOT command is not properly set");
+			}     
+			
+			
         } catch (NumberFormatException e) {
             player.deactivate("Wrong output!");
             player.setScore(-1);
             gameManager.endGame();
         } catch (TimeoutException e) {
             gameManager.addToGameSummary(GameManager.formatErrorMessage(player.getNicknameToken() + " timeout!"));
+            player.deactivate(player.getNicknameToken() + " timeout!");
+            player.setScore(-1);
+            gameManager.endGame();
+        }catch (Exception e) {
+            gameManager.addToGameSummary(GameManager.formatErrorMessage(player.getNicknameToken() + e.getMessage()));
             player.deactivate(player.getNicknameToken() + " timeout!");
             player.setScore(-1);
             gameManager.endGame();
