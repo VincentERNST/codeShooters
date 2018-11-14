@@ -9,12 +9,6 @@ public class Player1 {
         Random random = new Random();
 
         while (true) {
-        	//grid
-            for (int r = 0; r < 3; r++) {
-                for (int c = 0; c < 3; c++) {
-                    grid[r][c] = scanner.nextInt();
-                }
-            }
             //players
             int m = scanner.nextInt();
             for(int i = 0;i<m;i++){
@@ -24,6 +18,8 @@ public class Player1 {
             	int vy = scanner.nextInt();
             	System.err.println(x+"  "+y+" "+vx+" "+vy);
             }           
+            
+            
             //bullets
             int n = scanner.nextInt();
             for(int i = 0;i<n;i++){
@@ -35,17 +31,12 @@ public class Player1 {
             }
         	
             
-            int r, c,x, y;
-            do {
-                r = random.nextInt(3);
-                c = random.nextInt(3);
-                x = random.nextInt(1920);
-                y = random.nextInt(1080);
-            } while (grid[r][c] != 0);
             
-            System.err.println( );
+            
+             int  x = random.nextInt(1920);
+             int  y = random.nextInt(1080);
 
-            System.out.println(String.format("%d %d %d %d", r, c,x ,y ));
+            System.out.println(String.format("%d %d",x ,y ));
         }
     }
 }

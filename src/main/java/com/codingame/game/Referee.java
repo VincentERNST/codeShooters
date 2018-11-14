@@ -23,20 +23,14 @@ import pojo.Utils;
 public class Referee extends AbstractReferee {
     @Inject private GameManager<Player> gameManager;
     @Inject private GraphicEntityModule graphicEntityModule;
-    private int[][] grid = new int[3][3];
 
     private List<Bullet> bullets = new ArrayList<Bullet>();
     private List<Sprite> bulletsSprites = new ArrayList<Sprite>();
     private Sprite[] playersSprites = new Sprite[Constants.NUMBER_OF_PLAYERS];
     private Unit[] players = new Unit[Constants.NUMBER_OF_PLAYERS];
     
-    private static final int CELL_SIZE = 250;
-    private static final int LINE_WIDTH = 10;
-    private static final int LINE_COLOR = 0xff0000;
     private static final int WIDTH = 1920;
     private static final int HEIGHT = 1080;
-    private static final int GRID_ORIGIN_Y = (int) Math.round(1080 / 2 - CELL_SIZE);
-    private static final int GRID_ORIGIN_X = (int) Math.round(1920 / 2 - CELL_SIZE);
 
     @Override
     public Properties init(Properties params) {
@@ -58,7 +52,14 @@ public class Referee extends AbstractReferee {
                     .setFontSize(90)
                     .setFillColor(player.getColorToken())
                     .setAnchor(0);
-            
+
+            graphicEntityModule.createSprite()
+                    .setX(100 + (player.getIndex() % 2) * 1400)
+                    .setY(90 + 100 * (player.getIndex() / 2))
+                    .setZIndex(20)
+                    .setImage(player.getAvatarToken())
+                    .setAnchor(0.5);
+
             //create units
             players[player.getIndex()] = new Unit(player.getIndex(), WIDTH/4 + 2*(player.getIndex())*WIDTH/4,3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4,0,0,Constants.PLAYER_AMORT);
             
@@ -67,8 +68,10 @@ public class Referee extends AbstractReferee {
 			.setX(WIDTH/4 + 2*(player.getIndex())*WIDTH/4 )
 			.setY(3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4)
                     .setZIndex(20)
-                    .setImage("test.png")
                     .setAnchor(0.5);
+            
+            if(player.getIndex() ==1) {s.setImage("pitlord.jpg");}//player2 img
+            else{ s.setImage("test.png");}
             playersSprites[player.getIndex()] = s;
             
         }
@@ -79,66 +82,16 @@ public class Referee extends AbstractReferee {
         return params;
     }
 
-    private int convertX(double unit) {
-        return (int) (GRID_ORIGIN_X + unit * CELL_SIZE);
-    }
-
-    private int convertY(double unit) {
-        return (int) (GRID_ORIGIN_Y + unit * CELL_SIZE);
-    }
-
-    private void drawGrid() {
-        double xs[] = new double[] { 0, 0, 1, 2 };
-        double x2s[] = new double[] { 2, 2, 0, 1 };
-        double ys[] = new double[] { 1, 2, 0, 0 };
-        double y2s[] = new double[] { 0, 1, 2, 2 };
-
-        for (int i = 0; i < 4; ++i) {
-            graphicEntityModule.createLine()
-                    .setX(convertX(xs[i] - 0.5))
-                    .setX2(convertX(x2s[i] + 0.5))
-                    .setY(convertY(ys[i] - 0.5))
-                    .setY2(convertY(y2s[i] + 0.5))
-                    .setLineWidth(LINE_WIDTH)
-                    .setLineColor(LINE_COLOR);
-        }
-
-    }
-
     private int checkWinner() {
-        for (int i = 0; i < 3; i++) {
-            // check rows
-            if (grid[i][0] > 0 && grid[i][0] == grid[i][1] && grid[i][0] == grid[i][2]) {
-                return grid[i][0];
-            }
-
-            // check cols
-            if (grid[0][i] > 0 && grid[0][i] == grid[1][i] && grid[0][i] == grid[2][i]) {
-                return grid[0][i];
-            }
-        }
-
-        // check diags
-        if (grid[0][0] > 0 && grid[0][0] == grid[1][1] && grid[0][0] == grid[2][2]) {
-            return grid[0][0];
-        }
-        if (grid[2][0] > 0 && grid[2][0] == grid[1][1] && grid[2][0] == grid[0][2]) {
-            return grid[2][0];
-        }
-
-        return 0;
+    	return 0;
     }
 
     @Override
     public void gameTurn(int turn) {
-        Player player = gameManager.getPlayer(turn % gameManager.getPlayerCount());
-
-        // Send grid inputs
-        for (int l = 0; l < 3; l++) {
-            player.sendInputLine(String.format("%d %d %d", grid[l][0], grid[l][1], grid[l][2]));
-        }
-        
+    	//turn from 0 to end
+    	
         //send players inputs
+    	Player player = gameManager.getPlayer(turn % gameManager.getPlayerCount());
         player.sendInputLine(String.format("%d", Constants.NUMBER_OF_PLAYERS));
         Unit unit= players[turn % gameManager.getPlayerCount()];
         player.sendInputLine(String.format("%d %d %d %d",(int)unit.x, (int)unit.y, (int)unit.vx, (int)unit.vy));
@@ -157,29 +110,16 @@ public class Referee extends AbstractReferee {
         //todo send player positions
         try {
             String[] output = player.getOutputs().get(0).split(" ");
-            int targetRow = Integer.parseInt(output[0]);
-            int targetCol = Integer.parseInt(output[1]);
             
-            int targetShootX = Integer.parseInt(output[2]);
-            int targetShootY = Integer.parseInt(output[3]);
+            int targetShootX = Integer.parseInt(output[0]);
+            int targetShootY = Integer.parseInt(output[1]);
             Bullet b = new Bullet(bullets.size(),(int)unit.x, (int)unit.y, 20, 20);
             Point target = new Point(targetShootX , targetShootY);
-            Utils.aim(b, new Point(targetShootX , targetShootY),100.0);
+            Utils.aim(b, new Point(targetShootX , targetShootY),300.0);
             bullets.add(b);
             draw(b,target);
             
-            if (targetRow < 0 || targetRow >= 3 || targetCol < 0 || targetCol >= 3 || grid[targetRow][targetCol] != 0) {
-                player.deactivate("Invalid action.");
-                player.setScore(-1);
-                gameManager.endGame();
-            } else {
-                
-            }
-
-            gameManager.addToGameSummary(String.format("Player %s played (%d %d)", player.getNicknameToken(), targetRow, targetCol));
-
-            // update grid
-            grid[targetRow][targetCol] = player.getIndex() + 1;
+            gameManager.addToGameSummary(String.format("Player %s played shoot (%d %d) ", player.getNicknameToken(), targetShootX, targetShootY));
 
         } catch (NumberFormatException e) {
             player.deactivate("Wrong output!");
@@ -195,7 +135,7 @@ public class Referee extends AbstractReferee {
         //TODO
         //animate Bullets
         moveBullets();
-        drawBullets();
+        //drawBullets();
 
         //TODO
         //animate players
@@ -203,10 +143,18 @@ public class Referee extends AbstractReferee {
 
         // check winner
         int winner = checkWinner();
-        if (winner > 0) {
+        if (winner > 0 ) {
             gameManager.addToGameSummary(GameManager.formatSuccessMessage(player.getNicknameToken() + " won!"));
             gameManager.getPlayer(winner - 1).setScore(1);
             gameManager.endGame();
+        }
+        //check tie
+        if( turn > 15) {
+        	gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
+        	//TODO tie breaker
+        	gameManager.getPlayer(0).setScore(1);
+        	gameManager.getPlayer(1).setScore(1);
+        	gameManager.endGame();
         }
         
     }
@@ -239,9 +187,59 @@ public class Referee extends AbstractReferee {
 	
 	private void moveBullets() {
 		for(Bullet b : bullets){
-			b.move(1.0);
-			b.end();
+			
+			Sprite s = bulletsSprites.get(b.id);
+			graphicEntityModule.commitEntityState(0, s);
+			
+				double ty0 = b.vy==0 ? 10.0 : b.y /-b.vy ;
+				double ty1 = b.vy==0 ? 10.0 : (1080 - b.y) /b.vy ;
+				
+				double tx0 = b.vx==0 ? 10.0 : b.x /-b.vx ;
+				double tx1 = b.vx==0 ? 10.0 : (1920 - b.x) /b.vx ;
+				
+				if(ty0 < 1.0 && ty0>0) {
+					bounce(b,s,Constants.VERTICAL,ty0);
+				}
+				else if(ty1 < 1.0 && ty1>0) {
+					bounce(b,s,Constants.VERTICAL,ty1);
+				}
+				else if(tx0 < 1.0 && tx0>0 ) {
+					bounce(b,s,Constants.HORIZONTAL,tx0);
+				}
+				else if(tx1 < 1.0 && tx1>0) {
+					bounce(b,s,Constants.HORIZONTAL,tx1);
+				}
+				else {
+					b.move(1.0);
+					b.end();
+		            s.setX( (int) b.x)
+		            .setY( (int) b.y)
+		            .setImage("bullet.png")
+		            .setAnchor(0.5); 
+		            graphicEntityModule.commitEntityState(1, s); 
+				}
 		}
+	}
+
+	private void bounce(Bullet b,Sprite s, int direction, double t) {
+		 
+		b.move(t);
+		b.end();
+		if(direction == Constants.HORIZONTAL) {b.vx=-b.vx;}
+		if(direction == Constants.VERTICAL) {b.vy=-b.vy;}
+		
+		s.setX( (int) b.x)
+		.setY( (int) b.y)
+		.setImage("bullet.png")
+		.setAnchor(0.5); 
+		graphicEntityModule.commitEntityState(t, s);
+		
+		b.move(1.0-t);
+		s.setX( (int) b.x)
+		.setY( (int) b.y)
+		.setImage("bullet.png")
+		.setAnchor(0.5); 
+		graphicEntityModule.commitEntityState(1, s); 
 	}
 	
 	 
