@@ -1,5 +1,7 @@
 package pojo;
 
+import com.codingame.gameengine.module.entities.Sprite;
+
 public class Unit extends Point{
 	
 	public int id;
@@ -7,6 +9,7 @@ public class Unit extends Point{
 	public double vy;
 	public double r=50.0;
 	public double f;
+	public Sprite s;
 	
 	public Unit(int id, int x, int y, int vx, int vy, double f) {
 		super(x,y);

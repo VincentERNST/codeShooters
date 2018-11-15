@@ -25,8 +25,6 @@ public class Referee extends AbstractReferee {
     @Inject private GraphicEntityModule graphicEntityModule;
 
     private List<Bullet> bullets = new ArrayList<Bullet>();
-    private List<Sprite> bulletsSprites = new ArrayList<Sprite>();
-    private Sprite[] playersSprites = new Sprite[Constants.NUMBER_OF_PLAYERS];
     private Unit[] players = new Unit[Constants.NUMBER_OF_PLAYERS];
     
     private static final int WIDTH = 1920;
@@ -72,7 +70,6 @@ public class Referee extends AbstractReferee {
             
             if(player.getIndex() ==1) {s.setImage("pitlord.jpg");}//player2 img
             else{ s.setImage("test.png");}
-            playersSprites[player.getIndex()] = s;
             
         }
         
@@ -194,20 +191,19 @@ public class Referee extends AbstractReferee {
         .setImage("bullet.png")
         .setRotation(angle)
         .setAnchor(0.5);  
-        bulletsSprites.add(s);
+        b.s=s;
 	}
 
 	private void drawBullets() {
 		
 		for(int i=0; i< bullets.size(); i++){
-        	Sprite s = bulletsSprites.get(i);
         	Bullet b = bullets.get(i);
-            graphicEntityModule.commitEntityState(0, s);
-            s.setX( (int) b.x)
+            graphicEntityModule.commitEntityState(0, b.s);
+            b.s.setX( (int) b.x)
             .setY( (int) b.y)
             .setImage("bullet.png")
             .setAnchor(0.5); 
-            graphicEntityModule.commitEntityState(1, s);
+            graphicEntityModule.commitEntityState(1, b.s);
         }		
 		
 	}
@@ -215,8 +211,7 @@ public class Referee extends AbstractReferee {
 	private void moveBullets() {
 		for(Bullet b : bullets){
 			
-			Sprite s = bulletsSprites.get(b.id);
-			graphicEntityModule.commitEntityState(0, s);
+			graphicEntityModule.commitEntityState(0, b.s);
 			
 				double ty0 = b.vy==0 ? 10.0 : b.y /-b.vy ;
 				double ty1 = b.vy==0 ? 10.0 : (1080 - b.y) /b.vy ;
@@ -225,48 +220,48 @@ public class Referee extends AbstractReferee {
 				double tx1 = b.vx==0 ? 10.0 : (1920 - b.x) /b.vx ;
 				
 				if(ty0 < 1.0 && ty0>0) {
-					bounce(b,s,Constants.VERTICAL,ty0);
+					bounce(b, Constants.VERTICAL,ty0);
 				}
 				else if(ty1 < 1.0 && ty1>0) {
-					bounce(b,s,Constants.VERTICAL,ty1);
+					bounce(b, Constants.VERTICAL,ty1);
 				}
 				else if(tx0 < 1.0 && tx0>0 ) {
-					bounce(b,s,Constants.HORIZONTAL,tx0);
+					bounce(b, Constants.HORIZONTAL,tx0);
 				}
 				else if(tx1 < 1.0 && tx1>0) {
-					bounce(b,s,Constants.HORIZONTAL,tx1);
+					bounce(b, Constants.HORIZONTAL,tx1);
 				}
 				else {
 					b.move(1.0);
 					b.end();
-		            s.setX( (int) b.x)
+					b.s.setX( (int) b.x)
 		            .setY( (int) b.y)
 		            .setImage("bullet.png")
 		            .setAnchor(0.5); 
-		            graphicEntityModule.commitEntityState(1, s); 
+		            graphicEntityModule.commitEntityState(1, b.s); 
 				}
 		}
 	}
 
-	private void bounce(Bullet b,Sprite s, int direction, double t) {
+	private void bounce(Bullet b , int direction, double t) {
 		 
 		b.move(t);
 		b.end();
 		if(direction == Constants.HORIZONTAL) {b.vx=-b.vx;}
 		if(direction == Constants.VERTICAL) {b.vy=-b.vy;}
 		
-		s.setX( (int) b.x)
+		b.s.setX( (int) b.x)
 		.setY( (int) b.y)
 		.setImage("bullet.png")
 		.setAnchor(0.5); 
-		graphicEntityModule.commitEntityState(t, s);
+		graphicEntityModule.commitEntityState(t, b.s);
 		
 		b.move(1.0-t);
-		s.setX( (int) b.x)
+		b.s.setX( (int) b.x)
 		.setY( (int) b.y)
 		.setImage("bullet.png")
 		.setAnchor(0.5); 
-		graphicEntityModule.commitEntityState(1, s); 
+		graphicEntityModule.commitEntityState(1, b.s); 
 	}
 	
 	 
