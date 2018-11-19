@@ -68,9 +68,12 @@ function getMouseMoveFunc(tooltip, container, module) {
           }
         }
         tooltip.label.text = tooltipBlocks.join('\n──────────\n')
-      } else {
-        //tooltip.visible = false;
-        tooltip.label.text = 'we are : '+tooltip.x;
+      } else if(tooltip.x<0 || tooltip.y<0 || tooltip.x > WIDTH || tooltip.y > HEIGHT){
+    	  tooltip.visible = false;
+      }
+      else{
+        tooltip.visible = true;
+        tooltip.label.text = 'x : '+Math.round(tooltip.x)+'\n'+'y : '+Math.round(tooltip.y);
       }
 
       tooltip.background.width = tooltip.label.width + 20;

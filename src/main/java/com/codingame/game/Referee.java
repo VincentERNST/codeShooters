@@ -73,6 +73,7 @@ public class Referee extends AbstractReferee {
             if(player.getIndex() ==1) {s.setImage("pitlord.jpg");}//player2 img
             else{ s.setImage("test.png");}
             players[player.getIndex()].s=s;
+            players[player.getIndex()].register(tooltipModule);
             
         }
         
