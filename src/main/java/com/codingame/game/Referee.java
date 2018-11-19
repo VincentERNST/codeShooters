@@ -8,8 +8,7 @@ import java.util.Random;
 import com.codingame.gameengine.core.AbstractPlayer.TimeoutException;
 import com.codingame.gameengine.core.AbstractReferee;
 import com.codingame.gameengine.core.GameManager;
-import com.codingame.gameengine.module.entities.Circle;
-import com.codingame.gameengine.module.entities.Curve;
+import com.codingame.gameengine.core.Tooltip;
 import com.codingame.gameengine.module.entities.GraphicEntityModule;
 import com.codingame.gameengine.module.entities.Sprite;
 import com.google.inject.Inject;
@@ -19,6 +18,7 @@ import pojo.Constants;
 import pojo.Point;
 import pojo.Unit;
 import pojo.Utils;
+import view.TooltipModule;
 
 public class Referee extends AbstractReferee {
     @Inject private GameManager<Player> gameManager;
@@ -26,12 +26,14 @@ public class Referee extends AbstractReferee {
 
     private List<Bullet> bullets = new ArrayList<Bullet>();
     private Unit[] players = new Unit[Constants.NUMBER_OF_PLAYERS];
+    private TooltipModule tooltipModule;
     
     private static final int WIDTH = 1920;
     private static final int HEIGHT = 1080;
 
     @Override
     public Properties init(Properties params) {
+    	  tooltipModule = new TooltipModule(gameManager);
         // Display the background image. The asset image must be in the directory src/main/resources/view/assets
         graphicEntityModule.createSprite()
                 .setImage("Background.jpg")
@@ -70,6 +72,7 @@ public class Referee extends AbstractReferee {
             
             if(player.getIndex() ==1) {s.setImage("pitlord.jpg");}//player2 img
             else{ s.setImage("test.png");}
+            players[player.getIndex()].s=s;
             
         }
         
@@ -102,6 +105,7 @@ public class Referee extends AbstractReferee {
         }
         
         player.execute();
+        gameManager.addTooltip(new Tooltip(player.getIndex() ,   player.getNicknameToken()+" has won one cell")); // TOOLTIP EVENT Progress bar
         
         // Read inputs
         //todo send player positions
@@ -117,6 +121,9 @@ public class Referee extends AbstractReferee {
 				int targetMoveX = Integer.parseInt(move.split(" ")[1]);
 				int targetMoveY = Integer.parseInt(move.split(" ")[2]);
 				gameManager.addToGameSummary(String.format("Player %s played Move (%d %d) ", player.getNicknameToken(),targetMoveX,targetMoveY));
+				Utils.aim(players[ player.getIndex() ]  , new Point(targetMoveX , targetMoveY),100.0);
+				
+				 
 			}
 			else{
 				throw new Exception(" MOVE command is not properly set");
@@ -159,6 +166,7 @@ public class Referee extends AbstractReferee {
         //TODO
         //animate Bullets
         moveBullets();
+        movePlayers();
         //drawBullets();
 
         //TODO
@@ -182,6 +190,7 @@ public class Referee extends AbstractReferee {
         }
         
     }
+
 
 	private void draw(Bullet b, Point target) {
 		double angle = Utils.angle(b, target);
@@ -236,14 +245,56 @@ public class Referee extends AbstractReferee {
 					b.end();
 					b.s.setX( (int) b.x)
 		            .setY( (int) b.y)
-		            .setImage("bullet.png")
 		            .setAnchor(0.5); 
 		            graphicEntityModule.commitEntityState(1, b.s); 
 				}
+				
+				b.register(tooltipModule);//update tooltip for next turn
 		}
 	}
+	
+	
 
-	private void bounce(Bullet b , int direction, double t) {
+	private void movePlayers() {
+		
+		for(Unit p : players){
+			
+			graphicEntityModule.commitEntityState(0, p.s);
+				double ty0 = p.vy==0 ? 10.0 : p.y /-p.vy ;
+				double ty1 = p.vy==0 ? 10.0 : (1080 - p.y) /p.vy ;
+				
+				double tx0 = p.vx==0 ? 10.0 : p.x /-p.vx ;
+				double tx1 = p.vx==0 ? 10.0 : (1920 - p.x) /p.vx ;
+				
+				if(ty0 < 1.0 && ty0>0) {
+					bounce(p, Constants.VERTICAL,ty0);
+				}
+				else if(ty1 < 1.0 && ty1>0) {
+					bounce(p, Constants.VERTICAL,ty1);
+				}
+				else if(tx0 < 1.0 && tx0>0 ) {
+					bounce(p, Constants.HORIZONTAL,tx0);
+				}
+				else if(tx1 < 1.0 && tx1>0) {
+					bounce(p, Constants.HORIZONTAL,tx1);
+				}
+				else {
+					p.move(1.0);
+					p.end();
+					p.s.setX( (int) p.x)
+		            .setY( (int) p.y)
+		            .setAnchor(0.5); 
+		            graphicEntityModule.commitEntityState(1, p.s); 
+				}
+				
+			p.register(tooltipModule);//update tooltip for next turn
+		}
+		
+	}
+	
+	
+	
+	private void bounce(Unit b , int direction, double t) {
 		 
 		b.move(t);
 		b.end();

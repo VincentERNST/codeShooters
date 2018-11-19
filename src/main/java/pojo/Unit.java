@@ -1,6 +1,10 @@
 package pojo;
 
+import java.util.HashMap;
+
 import com.codingame.gameengine.module.entities.Sprite;
+
+import view.TooltipModule;
 
 public class Unit extends Point{
 	
@@ -17,7 +21,7 @@ public class Unit extends Point{
 		this.vx = vx;
 		this.vy = vy;
 		this.f=f;
-	}
+	}	
 	
 	public void move(double t){
 		x+=t*vx;
@@ -36,6 +40,16 @@ public class Unit extends Point{
 		vy = (int)Math.round(f*vy);
 	}
 	
+	public void register( TooltipModule tooltipModule){
+		if(s==null){return;}
+		
+	    StringBuilder sb = new StringBuilder();
+	    sb.append("x: ").append((int)this.x).append("\n")
+	      .append("y: ").append((int)this.y).append("\n");
+	    
+        tooltipModule.registerEntity(s, new HashMap<>());
+        tooltipModule.updateExtraTooltipText(s, sb.toString());
+	}
 	
 //    public static Collision CollisionMurale(double from){
 //		double tx = 2.0;
