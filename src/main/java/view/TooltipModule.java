@@ -23,6 +23,8 @@ public class TooltipModule implements Module {
     newRegistrations = new HashMap<>();
     extra = new HashMap<>();
     newExtra = new HashMap<>();
+    extra.put(0, new String[] {"test extra"});
+    newExtra.put(0, new String[] {"test newExtra"});
   }
 
   @Override
@@ -44,7 +46,7 @@ public class TooltipModule implements Module {
     Object[] data = { newRegistrations, newExtra };
     gameManager.setViewData("tooltips", data);
     newRegistrations.clear();
-    newExtra.clear();
+    //newExtra.clear();
   }
 
   public void registerEntity(Entity<?> entity) {
