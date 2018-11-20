@@ -2,7 +2,9 @@ package pojo;
 
 import java.util.HashMap;
 
+import com.codingame.gameengine.module.entities.Group;
 import com.codingame.gameengine.module.entities.Sprite;
+import com.codingame.gameengine.module.entities.Text;
 
 import view.TooltipModule;
 
@@ -14,6 +16,7 @@ public class Unit extends Point{
 	public double r=50.0;
 	public double f;
 	public Sprite s;
+	public Text message;
 	
 	public Unit(int id, int x, int y, int vx, int vy, double f) {
 		super(x,y);

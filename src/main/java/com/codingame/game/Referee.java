@@ -62,7 +62,7 @@ public class Referee extends AbstractReferee {
                     .setAnchor(0.5);
 
             //create units
-            players[player.getIndex()] = new Unit(player.getIndex(), WIDTH/4 + 2*(player.getIndex())*WIDTH/4,3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4,0,0,Constants.PLAYER_AMORT);
+            players[player.getIndex()] = new Unit(player.getIndex(), WIDTH/4 + 2*(player.getIndex())*WIDTH/4,3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4,0,0,Constants.PLAYER_AMORT) ;
             
             //create player sprite
             Sprite s = graphicEntityModule.createSprite()
@@ -75,6 +75,20 @@ public class Referee extends AbstractReferee {
             else{ s.setImage("test.png");}
             players[player.getIndex()].s=s;
             players[player.getIndex()].register(tooltipModule);
+            
+            
+            //create message sprite for players
+            String text = player.getIndex()==0 ? ":)" : ":(";
+            Text msg = graphicEntityModule.createText(text)
+                    .setX((int)players[player.getIndex()].x)
+                    .setY((int)players[player.getIndex()].y - 100)
+                    .setZIndex(20)
+//                    .setFontSize(30)
+                    .setFontSize(60)
+                    .setFillColor(0xFFAC59)
+                    .setAnchor(0.5);
+            
+            players[player.getIndex()].message=msg;
             
         }
         
@@ -125,6 +139,7 @@ public class Referee extends AbstractReferee {
 				gameManager.addToGameSummary(String.format("Player %s played Move (%d %d) ", player.getNicknameToken(),targetMoveX,targetMoveY));
 				Utils.aim(players[ player.getIndex() ]  , new Point(targetMoveX , targetMoveY),100.0);
 				
+				players[player.getIndex()].message.setText(targetMoveX+ " "+targetMoveY);
 				 
 			}
 			else{
@@ -281,15 +296,11 @@ public class Referee extends AbstractReferee {
 		            .setAnchor(0.5); 
 		            graphicEntityModule.commitEntityState(1, p.s); 
 		            
-		            Text msg = graphicEntityModule.createText("xD")
-		                    .setX((int)p.x)
-		                    .setY((int)p.y - 100)
-		                    .setZIndex(20)
-		                    .setFontSize(30)
-		                    .setFillColor(0xffffff)
-		                    .setAnchor(0.5);
 		            
-		            graphicEntityModule.commitEntityState(1, p.s); 
+		            p.message.setX( (int) p.x)
+		            .setY( (int) p.y-100)
+		            .setAnchor(0.5); 
+		            graphicEntityModule.commitEntityState(1,p.message); 
 				}
 				
 			p.register(tooltipModule);//update tooltip for next turn
