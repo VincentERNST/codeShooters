@@ -30,10 +30,6 @@ function getMouseMoveFunc(tooltip, container, module) {
       var pos = ev.data.getLocalPosition(container);
       tooltip.x = pos.x;
       tooltip.y = pos.y;
-      var point = {
-        x: pos.x * entityModule.coeff,
-        y: pos.y * entityModule.coeff
-      };
 
       const showing = [];
       const ids = Object.keys(tooltip.inside).map(n => +n);
@@ -67,10 +63,13 @@ function getMouseMoveFunc(tooltip, container, module) {
             tooltipBlocks.push(tooltipBlock);
           }
         }
-        tooltip.label.text = tooltipBlocks.join('\n──────────\n')
-      } else {
-        //tooltip.visible = false;
-        tooltip.label.text = 'we are : '+tooltip.x;
+        tooltip.label.text = tooltipBlocks.join('\n─────────\n')
+      } else if(tooltip.x<0 || tooltip.y<0 || tooltip.x > WIDTH || tooltip.y > HEIGHT){
+    	  tooltip.visible = false;
+      }
+      else{
+        tooltip.visible = true;
+        tooltip.label.text = 'x : '+Math.round(tooltip.x)+'\n'+'y : '+Math.round(tooltip.y);
       }
 
       tooltip.background.width = tooltip.label.width + 20;

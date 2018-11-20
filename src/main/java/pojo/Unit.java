@@ -44,8 +44,9 @@ public class Unit extends Point{
 		if(s==null){return;}
 		
 	    StringBuilder sb = new StringBuilder();
-	    sb.append("x: ").append((int)this.x).append("\n")
-	      .append("y: ").append((int)this.y).append("\n");
+	    sb.append("Unit ").append(this.id).append("\n")
+	      .append("x : ").append((int)this.x).append("\n")
+	      .append("y : ").append((int)this.y);
 	    
         tooltipModule.registerEntity(s, new HashMap<>());
         tooltipModule.updateExtraTooltipText(s, sb.toString());

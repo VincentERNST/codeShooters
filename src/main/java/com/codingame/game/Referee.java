@@ -11,6 +11,7 @@ import com.codingame.gameengine.core.GameManager;
 import com.codingame.gameengine.core.Tooltip;
 import com.codingame.gameengine.module.entities.GraphicEntityModule;
 import com.codingame.gameengine.module.entities.Sprite;
+import com.codingame.gameengine.module.entities.Text;
 import com.google.inject.Inject;
 
 import pojo.Bullet;
@@ -73,6 +74,7 @@ public class Referee extends AbstractReferee {
             if(player.getIndex() ==1) {s.setImage("pitlord.jpg");}//player2 img
             else{ s.setImage("test.png");}
             players[player.getIndex()].s=s;
+            players[player.getIndex()].register(tooltipModule);
             
         }
         
@@ -163,15 +165,8 @@ public class Referee extends AbstractReferee {
             gameManager.endGame();
         }
         
-        //TODO
-        //animate Bullets
         moveBullets();
         movePlayers();
-        //drawBullets();
-
-        //TODO
-        //animate players
-        
 
         // check winner
         int winner = checkWinner();
@@ -284,6 +279,16 @@ public class Referee extends AbstractReferee {
 					p.s.setX( (int) p.x)
 		            .setY( (int) p.y)
 		            .setAnchor(0.5); 
+		            graphicEntityModule.commitEntityState(1, p.s); 
+		            
+		            Text msg = graphicEntityModule.createText("xD")
+		                    .setX((int)p.x)
+		                    .setY((int)p.y - 100)
+		                    .setZIndex(20)
+		                    .setFontSize(30)
+		                    .setFillColor(0xffffff)
+		                    .setAnchor(0.5);
+		            
 		            graphicEntityModule.commitEntityState(1, p.s); 
 				}
 				
