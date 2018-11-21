@@ -62,7 +62,7 @@ public class Referee extends AbstractReferee {
                     .setAnchor(0.5);
 
             //create units
-            players[player.getIndex()] = new Unit(player.getIndex(), WIDTH/4 + 2*(player.getIndex())*WIDTH/4,3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4,0,0,Constants.PLAYER_AMORT) ;
+            players[player.getIndex()] = new Unit(player.getIndex(), WIDTH/4 + 2*(player.getIndex())*WIDTH/4,3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4,0,0,Constants.PLAYER_RADIUS,Constants.PLAYER_AMORT,Constants.UNIT_TYPE_PLAYER);
             
             //create player sprite
             Sprite s = graphicEntityModule.createSprite()
@@ -139,7 +139,7 @@ public class Referee extends AbstractReferee {
 				gameManager.addToGameSummary(String.format("Player %s played Move (%d %d) ", player.getNicknameToken(),targetMoveX,targetMoveY));
 				Utils.aim(players[ player.getIndex() ]  , new Point(targetMoveX , targetMoveY),100.0);
 				
-				players[player.getIndex()].message.setText(targetMoveX+ " "+targetMoveY);
+//				players[player.getIndex()].message.setText(targetMoveX+ " "+targetMoveY);
 				 
 			}
 			else{
@@ -162,6 +162,11 @@ public class Referee extends AbstractReferee {
 			else{
 				throw new Exception(" SHOOT command is not properly set");
 			}     
+			
+			//comment 
+			if(output.length>2) {
+				players[player.getIndex()].message.setText(output[2]);
+			}
 			
 			
         } catch (NumberFormatException e) {
@@ -328,7 +333,7 @@ public class Referee extends AbstractReferee {
 		.setY( (int) b.y)
 		.setImage("bullet.png")
 		.setAnchor(0.5); 
-		graphicEntityModule.commitEntityState(1, b.s); 
+		graphicEntityModule.commitEntityState(1, b.s);
 	}
 	
 	 
