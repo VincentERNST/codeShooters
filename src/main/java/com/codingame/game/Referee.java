@@ -62,7 +62,7 @@ public class Referee extends AbstractReferee {
                     .setAnchor(0.5);
 
             //create units
-            players[player.getIndex()] = new Unit(player.getIndex(), WIDTH/4 + 2*(player.getIndex())*WIDTH/4,3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4,0,0,Constants.PLAYER_AMORT) ;
+            players[player.getIndex()] = new Unit(player.getIndex(), WIDTH/4 + 2*(player.getIndex())*WIDTH/4,3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4,0,0,Constants.PLAYER_RADIUS,Constants.PLAYER_AMORT,Constants.UNIT_TYPE_PLAYER);
             
             //create player sprite
             Sprite s = graphicEntityModule.createSprite()
@@ -139,7 +139,7 @@ public class Referee extends AbstractReferee {
 				gameManager.addToGameSummary(String.format("Player %s played Move (%d %d) ", player.getNicknameToken(),targetMoveX,targetMoveY));
 				Utils.aim(players[ player.getIndex() ]  , new Point(targetMoveX , targetMoveY),100.0);
 				
-				players[player.getIndex()].message.setText(targetMoveX+ " "+targetMoveY);
+//				players[player.getIndex()].message.setText(targetMoveX+ " "+targetMoveY);
 				 
 			}
 			else{
@@ -162,6 +162,11 @@ public class Referee extends AbstractReferee {
 			else{
 				throw new Exception(" SHOOT command is not properly set");
 			}     
+			
+			//comment 
+			if(output.length>2) {
+				players[player.getIndex()].message.setText(output[2]);
+			}
 			
 			
         } catch (NumberFormatException e) {
@@ -191,7 +196,7 @@ public class Referee extends AbstractReferee {
             gameManager.endGame();
         }
         //check tie
-        if( turn > 15) {
+        if(turn > 15) {
         	gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
         	//TODO tie breaker
         	gameManager.getPlayer(0).setScore(1);
@@ -232,11 +237,11 @@ public class Referee extends AbstractReferee {
 			
 			graphicEntityModule.commitEntityState(0, b.s);
 			
-				double ty0 = b.vy==0 ? 10.0 : b.y /-b.vy ;
-				double ty1 = b.vy==0 ? 10.0 : (1080 - b.y) /b.vy ;
+				double ty0 = b.vy==0 ? 1.1 : b.y+b.r /-b.vy ;
+				double ty1 = b.vy==0 ? 1.1 : (1080 - b.y-b.r) /b.vy ;
 				
-				double tx0 = b.vx==0 ? 10.0 : b.x /-b.vx ;
-				double tx1 = b.vx==0 ? 10.0 : (1920 - b.x) /b.vx ;
+				double tx0 = b.vx==0 ? 1.1 : b.x+b.r /-b.vx ;
+				double tx1 = b.vx==0 ? 1.1 : (1920 - b.x-b.r) /b.vx ;
 				
 				if(ty0 < 1.0 && ty0>0) {
 					bounce(b, Constants.VERTICAL,ty0);
@@ -271,10 +276,10 @@ public class Referee extends AbstractReferee {
 			
 			graphicEntityModule.commitEntityState(0, p.s);
 				double ty0 = p.vy==0 ? 10.0 : p.y /-p.vy ;
-				double ty1 = p.vy==0 ? 10.0 : (1080 - p.y) /p.vy ;
+				double ty1 = p.vy==0 ? 10.0 : (HEIGHT - p.y) /p.vy ;
 				
 				double tx0 = p.vx==0 ? 10.0 : p.x /-p.vx ;
-				double tx1 = p.vx==0 ? 10.0 : (1920 - p.x) /p.vx ;
+				double tx1 = p.vx==0 ? 10.0 : (WIDTH - p.x) /p.vx ;
 				
 				if(ty0 < 1.0 && ty0>0) {
 					bounce(p, Constants.VERTICAL,ty0);
@@ -318,19 +323,56 @@ public class Referee extends AbstractReferee {
 		if(direction == Constants.VERTICAL) {b.vy=-b.vy;}
 		
 		b.s.setX( (int) b.x)
-		.setY( (int) b.y)
-		.setImage("bullet.png")
-		.setAnchor(0.5); 
+		.setY( (int) b.y);
 		graphicEntityModule.commitEntityState(t, b.s);
 		
 		b.move(1.0-t);
 		b.s.setX( (int) b.x)
-		.setY( (int) b.y)
-		.setImage("bullet.png")
-		.setAnchor(0.5); 
-		graphicEntityModule.commitEntityState(1, b.s); 
+		.setY( (int) b.y);
+		graphicEntityModule.commitEntityState(1, b.s);
 	}
 	
-	 
+//    public static Collision CollisionMurale(Unit u, double from){
+//		double tx = 2.0;
+//		double ty = tx;
+//		
+//		double r= u.r;
+//		
+//		if(u.unitType==1 && u.y<5450  && 2050 <u.y){
+//			r=0.0;
+//		}
+//		
+//		if (u.x + u.vx < r) {
+//			tx = (r - u.x) / u.vx;
+//		} else if (u.x + u.vx > WIDTH - r) {
+//			tx = (WIDTH - r - u.x) / u.vx;
+//		}
+//
+//		if (u.y + u.vy < r) {
+//			ty = (r - u.y) / u.vy;
+//		} else if (u.y + u.vy > HEIGHT - r) {
+//			ty = (HEIGHT - r - u.y) / u.vy;
+//		}
+//
+//		int dir = -1;
+//		double t = -1.0;
+//
+//		if (tx < ty) {
+//			dir = HORIZONTAL;
+//			t = tx;
+//		} else {
+//			dir = VERTICAL;
+//			t = ty;
+//		}
+//		t+=from;
+//		if (t <= from || t > 1.0) {
+//			return null;
+//		}
+//		if (dir == HORIZONTAL) {
+//			return new Collision(u, MurH, t);
+//		} else {
+//			return new Collision(u, MurV, t);
+//		}
+//	} 
     
 }
