@@ -19,6 +19,7 @@ import pojo.Point;
 import pojo.Shooter;
 import pojo.Unit;
 import pojo.UnitFactory;
+import utils.Collision;
 import utils.Constants;
 import utils.Utils;
 import view.TooltipModule;
@@ -33,6 +34,7 @@ public class Referee extends AbstractReferee {
     
     private static final int WIDTH = 1920;
     private static final int HEIGHT = 1080;
+    private Random r = new Random();
 
     @Override
     public Properties init(Properties params) {
@@ -43,7 +45,7 @@ public class Referee extends AbstractReferee {
                 .setAnchor(0);
         
         
-        Random r = new Random();
+        
         	
         for (Player player : gameManager.getPlayers()) {
         	//expose avatars 
@@ -334,47 +336,41 @@ public class Referee extends AbstractReferee {
 		graphicEntityModule.commitEntityState(1, b.s);
 	}
 	
-//    public static Collision CollisionMurale(Unit u, double from){
-//		double tx = 2.0;
-//		double ty = tx;
-//		
-//		double r= u.r;
-//		
-//		if(u.unitType==1 && u.y<5450  && 2050 <u.y){
-//			r=0.0;
-//		}
-//		
-//		if (u.x + u.vx < r) {
-//			tx = (r - u.x) / u.vx;
-//		} else if (u.x + u.vx > WIDTH - r) {
-//			tx = (WIDTH - r - u.x) / u.vx;
-//		}
-//
-//		if (u.y + u.vy < r) {
-//			ty = (r - u.y) / u.vy;
-//		} else if (u.y + u.vy > HEIGHT - r) {
-//			ty = (HEIGHT - r - u.y) / u.vy;
-//		}
-//
-//		int dir = -1;
-//		double t = -1.0;
-//
-//		if (tx < ty) {
-//			dir = HORIZONTAL;
-//			t = tx;
-//		} else {
-//			dir = VERTICAL;
-//			t = ty;
-//		}
-//		t+=from;
-//		if (t <= from || t > 1.0) {
-//			return null;
-//		}
-//		if (dir == HORIZONTAL) {
-//			return new Collision(u, MurH, t);
-//		} else {
-//			return new Collision(u, MurV, t);
-//		}
-//	} 
+    public Collision CollisionMurale(Unit u,double from){
+    	
+		double tx = 2.0;
+		double ty = tx;
+		double r= u.r;
+		
+		if (u.x + u.vx < r) {
+			tx = (r - u.x) / u.vx;
+		} else if (u.x + u.vx > WIDTH - r) {
+			tx = (WIDTH - r - u.x) / u.vx;
+		}
+
+		if (u.y + u.vy < r) {
+			ty = (r - u.y) / u.vy;
+		} else if (u.y + u.vy > HEIGHT - r) {
+			ty = (HEIGHT - r - u.y) / u.vy;
+		}
+
+		int dir = -1;
+		double t = -1.0;
+
+		if (tx < ty) {
+			dir = Constants.HORIZONTAL;
+			t = tx;
+		} else {
+			dir = Constants.VERTICAL;
+			t = ty;
+		}
+		t+=from;
+		if (t <= from || t > 1.0) {
+			return null;
+		}
+		
+		return new Collision(u, UnitFactory.createWall(dir), t);
+		
+	}
     
 }

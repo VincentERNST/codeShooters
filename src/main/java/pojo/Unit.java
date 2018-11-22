@@ -16,6 +16,7 @@ public class Unit extends Point{
 	public double f;
 	public Sprite s;
 
+	public Unit(){super();}
 	
 	public Unit(int id, int x, int y, int vx, int vy, double r, double f) {
 		super(x,y);

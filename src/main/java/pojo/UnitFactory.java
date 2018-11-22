@@ -14,8 +14,8 @@ public class UnitFactory {
 		return new Bullet(++bulletNbr, x, y);
 	}
 	
-	public static Wall createWall(int x, int y, int dir){
-		return new Wall(x, y, dir);
+	public static Wall createWall(int dir){
+		return new Wall(dir);
 	}
 	
 }
