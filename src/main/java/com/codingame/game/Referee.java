@@ -15,10 +15,12 @@ import com.codingame.gameengine.module.entities.Text;
 import com.google.inject.Inject;
 
 import pojo.Bullet;
-import pojo.Constants;
 import pojo.Point;
+import pojo.Shooter;
 import pojo.Unit;
-import pojo.Utils;
+import pojo.UnitFactory;
+import utils.Constants;
+import utils.Utils;
 import view.TooltipModule;
 
 public class Referee extends AbstractReferee {
@@ -26,7 +28,7 @@ public class Referee extends AbstractReferee {
     @Inject private GraphicEntityModule graphicEntityModule;
 
     private List<Bullet> bullets = new ArrayList<Bullet>();
-    private Unit[] players = new Unit[Constants.NUMBER_OF_PLAYERS];
+    private Shooter[] players = new Shooter[Constants.NUMBER_OF_PLAYERS];
     private TooltipModule tooltipModule;
     
     private static final int WIDTH = 1920;
@@ -62,7 +64,7 @@ public class Referee extends AbstractReferee {
                     .setAnchor(0.5);
 
             //create units
-            players[player.getIndex()] = new Unit(player.getIndex(), WIDTH/4 + 2*(player.getIndex())*WIDTH/4,3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4,0,0,Constants.PLAYER_RADIUS,Constants.PLAYER_AMORT,Constants.UNIT_TYPE_PLAYER);
+            players[player.getIndex()] = UnitFactory.createShooter(WIDTH/4 + 2*(player.getIndex())*WIDTH/4,3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4,0,0);
             
             //create player sprite
             Sprite s = graphicEntityModule.createSprite()
@@ -153,7 +155,7 @@ public class Referee extends AbstractReferee {
 				int targetShootY = Integer.parseInt(shoot.split(" ")[2]);
 				gameManager.addToGameSummary(String.format("Player %s played shoot (%d %d) ", player.getNicknameToken(), targetShootX, targetShootY));
 				
-	            Bullet b = new Bullet(bullets.size(),(int)unit.x, (int)unit.y, 20, 20);
+	            Bullet b = UnitFactory.createBullet((int)unit.x, (int)unit.y);
 	            Point target = new Point(targetShootX , targetShootY);
 	            Utils.aim(b, new Point(targetShootX , targetShootY),300.0);
 	            bullets.add(b);
@@ -272,7 +274,7 @@ public class Referee extends AbstractReferee {
 
 	private void movePlayers() {
 		
-		for(Unit p : players){
+		for(Shooter p : players){
 			
 			graphicEntityModule.commitEntityState(0, p.s);
 				double ty0 = p.vy==0 ? 10.0 : p.y /-p.vy ;

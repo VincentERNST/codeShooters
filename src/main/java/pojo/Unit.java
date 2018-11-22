@@ -15,11 +15,9 @@ public class Unit extends Point{
 	public double r;
 	public double f;
 	public Sprite s;
-	public Text message;
-	public String unitType;
-	public int hp;
+
 	
-	public Unit(int id, int x, int y, int vx, int vy, double r, double f, String unitType) {
+	public Unit(int id, int x, int y, int vx, int vy, double r, double f) {
 		super(x,y);
 		this.id=id;
 		this.vx = vx;

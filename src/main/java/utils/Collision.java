@@ -1,4 +1,6 @@
-package pojo;
+package utils;
+
+import pojo.Unit;
 
 class Collision{
 	Unit u1;

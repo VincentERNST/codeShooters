@@ -1,4 +1,6 @@
-package pojo;
+package utils;
+
+import pojo.Point;
 
 public final class Constants {
 	
