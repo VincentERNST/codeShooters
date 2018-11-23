@@ -33,6 +33,9 @@ public class Referee extends AbstractReferee {
     private TooltipModule tooltipModule;
     private Random r = new Random();
 
+    
+    
+    
     @Override
     public Properties init(Properties params) {
     	  tooltipModule = new TooltipModule(gameManager);
@@ -97,9 +100,7 @@ public class Referee extends AbstractReferee {
         return params;
     }
 
-    private int checkWinner() {
-    	return 0;
-    }
+    
 
     @Override
     public void gameTurn(int turn) {
@@ -205,32 +206,15 @@ public class Referee extends AbstractReferee {
         
     }
 
+    
+    
+    private int checkWinner() {
+    	return 0;
+    }
+    
 
-	private void draw(Bullet b, Point target) {
-		double angle = Utils.angle(b, target);
-        Sprite s = graphicEntityModule.createSprite()
-        .setX((int) b.x)
-        .setY((int) b.y)
-        .setImage("bullet.png")
-        .setRotation(angle)
-        .setAnchor(0.5);  
-        b.s=s;
-	}
 
-	private void drawBullets() {
-		
-		for(int i=0; i< bullets.size(); i++){
-        	Bullet b = bullets.get(i);
-            graphicEntityModule.commitEntityState(0, b.s);
-            b.s.setX( (int) b.x)
-            .setY( (int) b.y)
-            .setImage("bullet.png")
-            .setAnchor(0.5); 
-            graphicEntityModule.commitEntityState(1, b.s);
-        }		
-		
-	}
-
+	
 	private void moveBullets() {
 		for (Bullet b : bullets) {
 
@@ -292,6 +276,23 @@ public class Referee extends AbstractReferee {
 	
 	
 	
+/** 						* *	* 								**
+ * 																*
+ * 																*
+ * 																*
+ * 																*
+ * 																*
+ * 																*
+ * 						   GRAPHICS                    			*
+ * 																*
+ * 																*
+ * 																*
+ * 																*
+ * 																*
+ * 																*
+ * 					        * *	* 								**
+ */
+	
 
 
 
@@ -306,5 +307,16 @@ public class Referee extends AbstractReferee {
 
 	private void commit(double t, Unit u) {
     	graphicEntityModule.commitEntityState(t, u.s);
+	}
+	
+	private void draw(Bullet b, Point target) {
+		double angle = Utils.angle(b, target);
+        Sprite s = graphicEntityModule.createSprite()
+        .setX((int) b.x)
+        .setY((int) b.y)
+        .setImage("bullet.png")
+        .setRotation(angle)
+        .setAnchor(0.5);  
+        b.s=s;
 	}
 }
