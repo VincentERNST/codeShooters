@@ -33,9 +33,6 @@ public class Referee extends AbstractReferee {
     private TooltipModule tooltipModule;
     private Random r = new Random();
 
-    
-    
-    
     @Override
     public Properties init(Properties params) {
     	  tooltipModule = new TooltipModule(gameManager);
@@ -85,7 +82,6 @@ public class Referee extends AbstractReferee {
                     .setX((int)players[player.getIndex()].x)
                     .setY((int)players[player.getIndex()].y - 100)
                     .setZIndex(20)
-//                    .setFontSize(30)
                     .setFontSize(60)
                     .setFillColor(0xFFAC59)
                     .setAnchor(0.5);
@@ -94,9 +90,7 @@ public class Referee extends AbstractReferee {
             
         }
         
-
         gameManager.setFrameDuration(500);
-
         return params;
     }
 
