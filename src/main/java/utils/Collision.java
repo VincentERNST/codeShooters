@@ -4,9 +4,11 @@ import pojo.Unit;
 import pojo.Wall;
 
 public class Collision{
-	Unit u1;
-	Unit u2;
-	double t;
+	
+	public Unit u1;
+	public Unit u2;
+	public double t;
+	
 	public Collision(Unit u1, Unit u2, double t) {
 		super();
 		this.u1 = u1;
@@ -14,7 +16,7 @@ public class Collision{
 		this.t = t;
 	}
 	
-	public void aplly() {
+	public void apply() {
 		
 		if( u2 instanceof Wall){
 			Wall wall = (Wall)u2;
@@ -38,5 +40,5 @@ public class Collision{
 		}
 		
 	}
-	
+
 }

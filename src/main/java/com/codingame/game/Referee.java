@@ -31,9 +31,6 @@ public class Referee extends AbstractReferee {
     private List<Bullet> bullets = new ArrayList<Bullet>();
     private Shooter[] players = new Shooter[Constants.NUMBER_OF_PLAYERS];
     private TooltipModule tooltipModule;
-    
-    private static final int WIDTH = 1920;
-    private static final int HEIGHT = 1080;
     private Random r = new Random();
 
     @Override
@@ -43,8 +40,6 @@ public class Referee extends AbstractReferee {
         graphicEntityModule.createSprite()
                 .setImage("Background.jpg")
                 .setAnchor(0);
-        
-        
         
         	
         for (Player player : gameManager.getPlayers()) {
@@ -66,12 +61,12 @@ public class Referee extends AbstractReferee {
                     .setAnchor(0.5);
 
             //create units
-            players[player.getIndex()] = UnitFactory.createShooter(WIDTH/4 + 2*(player.getIndex())*WIDTH/4,3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4,0,0);
+            players[player.getIndex()] = UnitFactory.createShooter(Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4,3*Constants.HEIGHT/4 -2*(player.getIndex() ) * Constants.HEIGHT/4,0,0);
             
             //create player sprite
             Sprite s = graphicEntityModule.createSprite()
-			.setX(WIDTH/4 + 2*(player.getIndex())*WIDTH/4 )
-			.setY(3*HEIGHT/4 -2*(player.getIndex() ) * HEIGHT/4)
+			.setX(Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4 )
+			.setY(3*Constants.HEIGHT/4 -2*(player.getIndex() ) * Constants.HEIGHT/4)
                     .setZIndex(20)
                     .setAnchor(0.5);
             
@@ -235,142 +230,81 @@ public class Referee extends AbstractReferee {
         }		
 		
 	}
-	
+
 	private void moveBullets() {
-		for(Bullet b : bullets){
-			
+		for (Bullet b : bullets) {
+
 			graphicEntityModule.commitEntityState(0, b.s);
-			
-				double ty0 = b.vy==0 ? 1.1 : b.y+b.r /-b.vy ;
-				double ty1 = b.vy==0 ? 1.1 : (1080 - b.y-b.r) /b.vy ;
-				
-				double tx0 = b.vx==0 ? 1.1 : b.x+b.r /-b.vx ;
-				double tx1 = b.vx==0 ? 1.1 : (1920 - b.x-b.r) /b.vx ;
-				
-				if(ty0 < 1.0 && ty0>0) {
-					bounce(b, Constants.VERTICAL,ty0);
-				}
-				else if(ty1 < 1.0 && ty1>0) {
-					bounce(b, Constants.VERTICAL,ty1);
-				}
-				else if(tx0 < 1.0 && tx0>0 ) {
-					bounce(b, Constants.HORIZONTAL,tx0);
-				}
-				else if(tx1 < 1.0 && tx1>0) {
-					bounce(b, Constants.HORIZONTAL,tx1);
-				}
-				else {
-					b.move(1.0);
-					b.end();
-					b.s.setX( (int) b.x)
-		            .setY( (int) b.y)
-		            .setAnchor(0.5); 
-		            graphicEntityModule.commitEntityState(1, b.s); 
-				}
-				
-				b.register(tooltipModule);//update tooltip for next turn
+			Collision collisionMurale = Utils.CollisionMurale(b, 0.0);
+			if (collisionMurale != null) {
+
+				b.move(collisionMurale.t);
+				b.end();
+				collisionMurale.apply();
+
+				b.s.setX((int) b.x).setY((int) b.y);
+				graphicEntityModule.commitEntityState(collisionMurale.t, b.s);
+
+				b.move(1.0 - collisionMurale.t);
+				b.s.setX((int) b.x).setY((int) b.y);
+				graphicEntityModule.commitEntityState(1, b.s);
+
+			} else {
+				b.move(1.0);
+				b.end();
+				b.s.setX((int) b.x).setY((int) b.y).setAnchor(0.5);
+				graphicEntityModule.commitEntityState(1, b.s);
+			}
+
+			b.register(tooltipModule);// update tooltip for next turn
 		}
 	}
 	
-	
 
+	
+	
 	private void movePlayers() {
 		
 		for(Shooter p : players){
 			
-			graphicEntityModule.commitEntityState(0, p.s);
-				double ty0 = p.vy==0 ? 10.0 : p.y /-p.vy ;
-				double ty1 = p.vy==0 ? 10.0 : (HEIGHT - p.y) /p.vy ;
+			commit(0,p);
+			Collision collisionMurale = Utils.CollisionMurale(p, 0.0);
+			
+			if (collisionMurale != null) {
+
+				p.move(collisionMurale.t);
+				collisionMurale.apply();
+				updateSprites(p,collisionMurale.t);
+
+				p.move(1.0 - collisionMurale.t);
+				updateSprites(p,1.0);
+
+			} else {
 				
-				double tx0 = p.vx==0 ? 10.0 : p.x /-p.vx ;
-				double tx1 = p.vx==0 ? 10.0 : (WIDTH - p.x) /p.vx ;
+				p.move(1.0);
+				updateSprites(p,1.0);
 				
-				if(ty0 < 1.0 && ty0>0) {
-					bounce(p, Constants.VERTICAL,ty0);
-				}
-				else if(ty1 < 1.0 && ty1>0) {
-					bounce(p, Constants.VERTICAL,ty1);
-				}
-				else if(tx0 < 1.0 && tx0>0 ) {
-					bounce(p, Constants.HORIZONTAL,tx0);
-				}
-				else if(tx1 < 1.0 && tx1>0) {
-					bounce(p, Constants.HORIZONTAL,tx1);
-				}
-				else {
-					p.move(1.0);
-					p.end();
-					p.s.setX( (int) p.x)
-		            .setY( (int) p.y)
-		            .setAnchor(0.5); 
-		            graphicEntityModule.commitEntityState(1, p.s); 
-		            
-		            
-		            p.message.setX( (int) p.x)
-		            .setY( (int) p.y-100)
-		            .setAnchor(0.5); 
-		            graphicEntityModule.commitEntityState(1,p.message); 
-				}
+			}
 				
 			p.register(tooltipModule);//update tooltip for next turn
 		}
-		
 	}
 	
 	
 	
-	private void bounce(Unit b , int direction, double t) {
-		 
-		b.move(t);
-		b.end();
-		if(direction == Constants.HORIZONTAL) {b.vx=-b.vx;}
-		if(direction == Constants.VERTICAL) {b.vy=-b.vy;}
-		
-		b.s.setX( (int) b.x)
-		.setY( (int) b.y);
-		graphicEntityModule.commitEntityState(t, b.s);
-		
-		b.move(1.0-t);
-		b.s.setX( (int) b.x)
-		.setY( (int) b.y);
-		graphicEntityModule.commitEntityState(1, b.s);
-	}
+
+
+
 	
-    public Collision CollisionMurale(Unit u,double from){
-    	
-		double tx = 2.0;
-		double ty = tx;
-		double r= u.r;
+    private void updateSprites(Shooter p, double t) {
+		p.s.setX((int) p.x).setY((int) p.y);
+		commit(t,p);
 		
-		if (u.x + u.vx < r) {
-			tx = (r - u.x) / u.vx;
-		} else if (u.x + u.vx > WIDTH - r) {
-			tx = (WIDTH - r - u.x) / u.vx;
-		}
-
-		if (u.y + u.vy < r) {
-			ty = (r - u.y) / u.vy;
-		} else if (u.y + u.vy > HEIGHT - r) {
-			ty = (HEIGHT - r - u.y) / u.vy;
-		}
-
-		int dir = -1;
-		double t = -1.0;
-
-		if (tx < ty) {
-			dir = Constants.HORIZONTAL;
-			t = tx;
-		} else {
-			dir = Constants.VERTICAL;
-			t = ty;
-		}
-		t+=from;
-		if (t <= from || t > 1.0) {
-			return null;
-		}
-		
-		return new Collision(u, UnitFactory.createWall(dir), t);
-		
+		p.message.setX( (int) p.x).setY( (int) p.y-100);
+        commit(t,p);
 	}
-    
+
+	private void commit(double t, Unit u) {
+    	graphicEntityModule.commitEntityState(t, u.s);
+	}
 }

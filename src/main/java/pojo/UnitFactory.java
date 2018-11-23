@@ -7,11 +7,11 @@ public class UnitFactory {
 	
 	
 	public static Shooter createShooter(int x, int y,int vx, int vy){
-		return new Shooter(++shooterNbr, x, y, vx ,vy);
+		return new Shooter(shooterNbr++, x, y, vx ,vy);
 	}
 	
 	public static Bullet createBullet(int x, int y){
-		return new Bullet(++bulletNbr, x, y);
+		return new Bullet(bulletNbr++, x, y);
 	}
 	
 	public static Wall createWall(int dir){
