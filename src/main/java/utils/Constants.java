@@ -12,7 +12,7 @@ public final class Constants {
 	public static double BULLET_AMORT = 0.8;
 	public static double PLAYER_AMORT = 0.9;
 	public static double PLAYER_HP = 1000;
-	public static double BULLET_RADIUS = 50.0;
+	public static double BULLET_RADIUS = 30.0;
 	public static double PLAYER_RADIUS = 200.0;
 	public static String UNIT_TYPE_BULLET = "BULLET";
 	public static String UNIT_TYPE_PLAYER = "PLAYER";

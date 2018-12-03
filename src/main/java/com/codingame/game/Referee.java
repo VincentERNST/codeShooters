@@ -93,7 +93,6 @@ public class Referee extends AbstractReferee {
         gameManager.setFrameDuration(500);
         return params;
     }
-
     
 
     @Override
@@ -113,12 +112,13 @@ public class Referee extends AbstractReferee {
         for(Bullet b : bullets){
         	player.sendInputLine(String.format("%d %d %d %d", (int)b.x, (int)b.y, (int)b.vx, (int)b.vy));
         }
-        
         player.execute();
+        
+        //TODO add tooltip when necesssary
         gameManager.addTooltip(new Tooltip(player.getIndex() ,   player.getNicknameToken()+" has won one cell")); // TOOLTIP EVENT Progress bar
         
+        
         // Read inputs
-        //todo send player positions
         try {
             String[] output = player.getOutputs().get(0).split(";");
             
@@ -304,12 +304,13 @@ public class Referee extends AbstractReferee {
 	}
 	
 	private void draw(Bullet b, Point target) {
-		double angle = Utils.angle(b, target);
+		//TODO remove rotation
+//		double angle = Utils.angle(b, target);
         Sprite s = graphicEntityModule.createSprite()
         .setX((int) b.x)
         .setY((int) b.y)
-        .setImage("bullet.png")
-        .setRotation(angle)
+        .setImage("bille.png")
+        .setScale(2*Constants.BULLET_RADIUS/100)
         .setAnchor(0.5);  
         b.s=s;
 	}

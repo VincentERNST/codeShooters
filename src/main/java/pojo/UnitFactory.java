@@ -5,7 +5,6 @@ public class UnitFactory {
 	static int shooterNbr;
 	static int bulletNbr;
 	
-	
 	public static Shooter createShooter(int x, int y,int vx, int vy){
 		return new Shooter(shooterNbr++, x, y, vx ,vy);
 	}
