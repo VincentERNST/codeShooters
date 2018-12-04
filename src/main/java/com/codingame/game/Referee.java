@@ -68,6 +68,7 @@ public class Referee extends AbstractReferee {
 			.setX(Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4 )
 			.setY(3*Constants.HEIGHT/4 -2*(player.getIndex() ) * Constants.HEIGHT/4)
                     .setZIndex(20)
+                    .setScale(2*Constants.PLAYER_RADIUS/100)
                     .setAnchor(0.5);
             
             if(player.getIndex() ==1) {s.setImage("pitlord.jpg");}//player2 img
