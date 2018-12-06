@@ -67,5 +67,10 @@ public class Utils {
 		
 	}
 	
-    
+	
+	public static boolean collide(Unit u1, Unit u2) {
+		return distance(u1, u2) < 2*(u1.r + u2.r);
+	}
+	
+	
 }

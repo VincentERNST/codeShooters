@@ -211,8 +211,32 @@ public class Referee extends AbstractReferee {
 
 	
 	private void moveBullets() {
-		for (Bullet b : bullets) {
 
+		for (Bullet b : bullets) {
+			if(b.tic<0) {
+				continue;
+			}
+			b.tic--;
+			if(b.tic==0 ) {
+				b.explosion();
+				remove(b);
+				continue;
+			}
+			if(b.tic < 3 && Utils.collide(b,players[0])  ) {
+				System.err.println(b.id+" hitting  player 0");
+				b.explosion();
+				remove(b);
+				continue;
+			}
+			if(b.tic < 3 && Utils.collide(b,players[1])  ) {
+				System.err.println(b.id+" hitting  player 1");
+				b.explosion();
+				remove(b);
+				continue;
+			}
+			if(b.tic==-1) {
+				b.s.setVisible(false);
+			}			
 			graphicEntityModule.commitEntityState(0, b.s);
 			Collision collisionMurale = Utils.CollisionMurale(b, 0.0);
 			if (collisionMurale != null) {
@@ -238,10 +262,12 @@ public class Referee extends AbstractReferee {
 			b.register(tooltipModule);// update tooltip for next turn
 		}
 	}
-	
 
-	
-	
+	private void remove(Bullet b) {
+		//TODO remove a bullet from list
+	}
+
+
 	private void movePlayers() {
 		
 		for(Shooter p : players){
