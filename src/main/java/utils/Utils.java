@@ -67,6 +67,31 @@ public class Utils {
 		
 	}
 	
+	public static Collision getCollision(Unit Unit, Unit Unit1, double from) {
+
+		double x2 = Unit.x - Unit1.x;
+		double y2 = Unit.y - Unit1.y;
+		double r2 = Unit.r+Unit1.r;
+		double vx2 = Unit.vx - Unit1.vx;
+		double vy2 = Unit.vy - Unit1.vy;
+		double a = vx2 * vx2 + vy2 * vy2;
+		if (a <= Constants.EPSILON) return null;
+
+
+		double b = 2.0 * (x2 * vx2 + y2 * vy2);
+		double c = x2 * x2 + y2 * y2 - r2 * r2;
+		double delta = b * b - 4.0 * a * c;
+		if (delta < 0.0) return null;
+		
+		double t =  (-b - Math.sqrt(delta)) / (2.0 * a);
+		if(t<=0.0) return null;
+		t+=from;
+		if(t>1.0)  return null;
+		
+		return new Collision(Unit, Unit1,t);
+	}
+	
+	
 	
 	public static boolean collide(Unit u1, Unit u2) {
 		return distance(u1, u2) < 2*(u1.r + u2.r);
