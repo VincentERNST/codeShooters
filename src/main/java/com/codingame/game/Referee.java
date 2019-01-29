@@ -41,15 +41,17 @@ public class Referee extends AbstractReferee {
                 .setImage("Background.jpg")
                 .setAnchor(0);
         
+		//TODO Bandeau HPs and Title
+        
         	
         for (Player player : gameManager.getPlayers()) {
         	//expose avatars 
             player.sendInputLine(String.format("%d", player.getIndex() + 1));
             graphicEntityModule.createText(player.getNicknameToken())
-                    .setX(180 + (player.getIndex() % 2) * 1400)
+                    .setX(140 + (player.getIndex() % 2) * 1400)
                     .setY(50 + 100 * (player.getIndex() / 2))
-                    .setZIndex(20)
-                    .setFontSize(90)
+                    .setZIndex(0)
+                    .setFontSize(30)
                     .setFillColor(player.getColorToken())
                     .setAnchor(0);
 
