@@ -29,8 +29,6 @@ public class Player1 {
             	int bulletVY = scanner.nextInt();
             	System.err.println(bulletX+"  "+bulletY);
             }
-        	
-            
             
             
              int  x = random.nextInt(1920);

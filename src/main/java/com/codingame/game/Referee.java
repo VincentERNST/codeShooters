@@ -31,8 +31,9 @@ public class Referee extends AbstractReferee {
     private List<Bullet> bullets = new ArrayList<Bullet>();
     private Shooter[] players = new Shooter[Constants.NUMBER_OF_PLAYERS];
     private TooltipModule tooltipModule;
-    private Random r = new Random();
+    private final static Random r = new Random();
 
+    
     @Override
     public Properties init(Properties params) {
     	  tooltipModule = new TooltipModule(gameManager);
@@ -42,8 +43,6 @@ public class Referee extends AbstractReferee {
                 .setAnchor(0);
         
 		//TODO Bandeau HPs and Title
-        
-        	
         for (Player player : gameManager.getPlayers()) {
         	//expose avatars 
             player.sendInputLine(String.format("%d", player.getIndex() + 1));
@@ -92,6 +91,8 @@ public class Referee extends AbstractReferee {
             players[player.getIndex()].message=msg;
             
         }
+        
+
         
         gameManager.setFrameDuration(500);
         return params;
@@ -266,7 +267,7 @@ public class Referee extends AbstractReferee {
 	}
 
 	private void remove(Bullet b) {
-		//TODO remove a bullet from list
+		//TODO remove a bullet from list  (get it back from A Bullet pools)
 	}
 
 

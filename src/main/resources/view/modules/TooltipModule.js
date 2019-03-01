@@ -1,8 +1,8 @@
 import { ErrorLog } from '../core/ErrorLog.js';
-import { WIDTH, HEIGHT } from '../core/constants.js';
+import { WIDTH, HEIGHT} from '../core/constants.js';
 import * as utils from '../core/utils.js';
 import { api as entityModule } from '../entity-module/GraphicEntityModule.js';
-
+const BAR = 120;
 
 function getMouseOverFunc(id, tooltip) {
   return function () {
@@ -64,7 +64,7 @@ function getMouseMoveFunc(tooltip, container, module) {
           }
         }
         tooltip.label.text = tooltipBlocks.join('\n─────────\n')
-      } else if(tooltip.x<0 || tooltip.y<0 || tooltip.x > WIDTH || tooltip.y > HEIGHT){
+      } else if(tooltip.x<0 || tooltip.y<BAR || tooltip.x > WIDTH || tooltip.y > HEIGHT){
     	  tooltip.visible = false;
       }
       else{
