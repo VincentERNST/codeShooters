@@ -31,7 +31,7 @@ public class Referee extends AbstractReferee {
     private List<Bullet> bullets = new ArrayList<Bullet>();
     private Shooter[] players = new Shooter[Constants.NUMBER_OF_PLAYERS];
     private TooltipModule tooltipModule;
-    private final static Random r = new Random();
+    private final static Random random = new Random();
 
     
     @Override
@@ -92,16 +92,16 @@ public class Referee extends AbstractReferee {
             
         }
         
-
-        
         gameManager.setFrameDuration(500);
         return params;
     }
     
 
+    
+    
     @Override
-    public void gameTurn(int turn) {
-    	//turn from 0 to end
+    public void gameTurn(int turn) {//turn from 0 to end
+
     	
         //send players inputs
     	Player player = gameManager.getPlayer(turn % gameManager.getPlayerCount());
@@ -111,6 +111,7 @@ public class Referee extends AbstractReferee {
         Unit enemy= players[gameManager.getPlayerCount()-1-turn % gameManager.getPlayerCount()];
         player.sendInputLine(String.format("%d %d %d %d",(int)enemy.x, (int)enemy.y, (int)enemy.vx, (int)enemy.vy));
         
+        
         //send bullets inputs
         player.sendInputLine(String.format("%d", bullets.size()));
         for(Bullet b : bullets){
@@ -118,15 +119,17 @@ public class Referee extends AbstractReferee {
         }
         player.execute();
         
+        
+        
         //TODO add tooltip when necesssary
-        gameManager.addTooltip(new Tooltip(player.getIndex() ,   player.getNicknameToken()+" has won one cell")); // TOOLTIP EVENT Progress bar
+        gameManager.addTooltip(new Tooltip(player.getIndex() ,   player.getNicknameToken()+" has fired a bullet")); // TOOLTIP EVENT Progress bar
         
         
         // Read inputs
         try {
             String[] output = player.getOutputs().get(0).split(";");
             
-            //move
+            //move commands
             String move = output[0];
             if(move.equals("WAIT")){
             	gameManager.addToGameSummary(String.format("Player %s is waiting ", player.getNicknameToken()));
@@ -136,9 +139,7 @@ public class Referee extends AbstractReferee {
 				int targetMoveY = Integer.parseInt(move.split(" ")[2]);
 				gameManager.addToGameSummary(String.format("Player %s played Move (%d %d) ", player.getNicknameToken(),targetMoveX,targetMoveY));
 				Utils.aim(players[ player.getIndex() ]  , new Point(targetMoveX , targetMoveY),100.0);
-				
 //				players[player.getIndex()].message.setText(targetMoveX+ " "+targetMoveY);
-				 
 			}
 			else{
 				throw new Exception(" MOVE command is not properly set");
@@ -152,6 +153,7 @@ public class Referee extends AbstractReferee {
 				gameManager.addToGameSummary(String.format("Player %s played shoot (%d %d) ", player.getNicknameToken(), targetShootX, targetShootY));
 				
 	            Bullet b = UnitFactory.createBullet((int)unit.x, (int)unit.y);
+	            
 	            Point target = new Point(targetShootX , targetShootY);
 	            Utils.aim(b, new Point(targetShootX , targetShootY),300.0);
 	            bullets.add(b);
@@ -163,9 +165,9 @@ public class Referee extends AbstractReferee {
 			
 			//comment 
 			if(output.length>2) {
+				
 				players[player.getIndex()].message.setText(output[2]);
 			}
-			
 			
         } catch (NumberFormatException e) {
             player.deactivate("Wrong output!");
@@ -183,6 +185,8 @@ public class Referee extends AbstractReferee {
             gameManager.endGame();
         }
         
+        
+        //apply moves
         moveBullets();
         movePlayers();
 
@@ -215,31 +219,35 @@ public class Referee extends AbstractReferee {
 	
 	private void moveBullets() {
 
-		for (Bullet b : bullets) {
+		for (int i=bullets.size()-1; i>=0 ; i--) {
+			Bullet b = bullets.get(i);
 			if(b.tic<0) {
 				continue;
 			}
 			b.tic--;
 			if(b.tic==0 ) {
 				b.explosion();
-				remove(b);
+				bullets.remove(b);
 				continue;
 			}
 			if(b.tic < 3 && Utils.collide(b,players[0])  ) {
 				System.err.println(b.id+" hitting  player 0");
 				b.explosion();
-				remove(b);
 				continue;
 			}
 			if(b.tic < 3 && Utils.collide(b,players[1])  ) {
 				System.err.println(b.id+" hitting  player 1");
-				b.explosion();
-				remove(b);
+				b.explosion();bullets.remove(b);
 				continue;
 			}
+			
 			if(b.tic==-1) {
 				b.s.setVisible(false);
+				continue;
 			}			
+			
+			
+			
 			graphicEntityModule.commitEntityState(0, b.s);
 			Collision collisionMurale = Utils.CollisionMurale(b, 0.0);
 			if (collisionMurale != null) {
@@ -264,10 +272,6 @@ public class Referee extends AbstractReferee {
 
 			b.register(tooltipModule);// update tooltip for next turn
 		}
-	}
-
-	private void remove(Bullet b) {
-		//TODO remove a bullet from list  (get it back from A Bullet pools)
 	}
 
 
@@ -320,6 +324,10 @@ public class Referee extends AbstractReferee {
 
 
 
+
+	private void commit(double t, Unit u) {
+    	graphicEntityModule.commitEntityState(t, u.s);
+	}
 	
     private void updateSprites(Shooter p, double t) {
 		p.s.setX((int) p.x).setY((int) p.y);
@@ -328,20 +336,11 @@ public class Referee extends AbstractReferee {
 		p.message.setX( (int) p.x).setY( (int) p.y-100);
         commit(t,p);
 	}
-
-	private void commit(double t, Unit u) {
-    	graphicEntityModule.commitEntityState(t, u.s);
-	}
 	
 	private void draw(Bullet b, Point target) {
-		//TODO remove rotation
-//		double angle = Utils.angle(b, target);
-        Sprite s = graphicEntityModule.createSprite()
-        .setX((int) b.x)
-        .setY((int) b.y)
-        .setImage("bille.png")
-        .setScale(2*Constants.BULLET_RADIUS/100)
-        .setAnchor(0.5);  
-        b.s=s;
+		if(b.s==null) {
+	        b.s=graphicEntityModule.createSprite();;
+		}
+		b.initSprite();
 	}
 }

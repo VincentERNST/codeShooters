@@ -44,7 +44,7 @@ public class Unit extends Point{
 		vy = (int)Math.round(f*vy);
 	}
 	
-	public void register( TooltipModule tooltipModule){
+	public void register(TooltipModule tooltipModule){
 		if(s==null){return;}
 		
 	    StringBuilder sb = new StringBuilder();

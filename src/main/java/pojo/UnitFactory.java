@@ -3,7 +3,6 @@ package pojo;
 import utils.Constants;
 
 public class UnitFactory {
-
 	static int shooterNbr;
 	static int bulletNbr;
     static Bullet[] bulletsPool = new Bullet[Constants.BULLET_POOL_SIZE];
@@ -25,7 +24,7 @@ public class UnitFactory {
 			b.x=x;
 			b.y=y;
 			b.id=bulletNbr++;
-			b.s.setVisible(true);//TODO reset sprite needed
+			b.tic=Constants.BULLET_TIC;
 			System.err.println("hello reusing bullet from pull nbr : "+idx);
 		}
 		return b;

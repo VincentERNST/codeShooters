@@ -15,5 +15,15 @@ public class Bullet extends Unit{
 		s.setImage("explosion2.png").setScale(2*Constants.EXPLOSION_RADIUS/100);
 		vx=0.;
 		vy=0.;
+		tic=-1;
+	}
+	
+	public void initSprite() {
+        s.setVisible(true)
+        .setX((int) x)
+        .setY((int) y)
+        .setImage("bille.png")
+        .setScale(2*Constants.BULLET_RADIUS/100)
+        .setAnchor(0.5);  
 	}
 }
