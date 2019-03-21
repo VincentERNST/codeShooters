@@ -165,7 +165,6 @@ public class Referee extends AbstractReferee {
 			
 			//comment 
 			if(output.length>2) {
-				
 				players[player.getIndex()].message.setText(output[2]);
 			}
 			
