@@ -21,7 +21,7 @@ public final class Constants {
 	public static double EXPLOSION_RADIUS = 200.0;
 	public static int BULLET_DAMAGE = 10;
 	public static int BULLET_AOE_DAMAGE = 2;
-	public static int PLAYER_BASE_HP = 20;
+	public static int PLAYER_BASE_HP = 100;
 	public static String UNIT_TYPE_BULLET = "BULLET";
 	public static String UNIT_TYPE_PLAYER = "PLAYER";
 	public static String UNIT_TYPE_WALL = "WALL";

@@ -1,7 +1,5 @@
 package pojo;
 
-import java.util.HashMap;
-
 import com.codingame.gameengine.module.entities.Sprite;
 import view.TooltipModule;
 
@@ -42,25 +40,8 @@ public class Unit extends Point{
 		vy = (int)Math.round(f*vy);
 	}
 	
-	public void register(TooltipModule tooltipModule){//TODO different registering MORPH
-		if(s==null){return;}
-		
-	    StringBuilder sb = new StringBuilder();
-	    sb.append("Unit ").append(this.id).append("\n")
-	      .append("x : ").append((int)this.x).append("\n")
-	      .append("y : ").append((int)this.y).append("\n")
-	      .append("vx : ").append((int)this.vx).append("\n")
-	      .append("vy : ").append((int)this.vy);
-	    
-	    if(this instanceof Shooter) {
-	    	sb.append("\n").append("life : ").append(((Shooter)this).hp);
-	    }
-	    if(this instanceof Bullet) {
-	    	sb.append("\n").append("TIC : ").append(((Bullet)this).tic);
-	    }
-	    
-        tooltipModule.registerEntity(s, new HashMap<>());
-        tooltipModule.updateExtraTooltipText(s, sb.toString());
+	public void register(TooltipModule tooltipModule){
+
 	}
 
 	@Override
