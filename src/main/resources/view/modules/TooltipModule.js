@@ -64,7 +64,10 @@ function getMouseMoveFunc(tooltip, container, module) {
           }
         }
         tooltip.label.text = tooltipBlocks.join('\n─────────\n')
-      } else if(tooltip.x<0 || tooltip.y<BAR || tooltip.x > WIDTH || tooltip.y > HEIGHT){
+      } else if(tooltip.x<0 
+    		  //|| tooltip.y<BAR 
+    		  || tooltip.y<0 
+    		  || tooltip.x > WIDTH || tooltip.y > HEIGHT){
     	  tooltip.visible = false;
       }
       else{

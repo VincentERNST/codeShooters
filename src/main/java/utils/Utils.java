@@ -1,11 +1,21 @@
 package utils;
 
+import java.util.List;
+
 import pojo.Point;
 import pojo.Unit;
 import pojo.UnitFactory;
 
 public class Utils {
 
+	public static double distance(Point p1,Point p2){
+		return Math.sqrt((p1.x-p2.x)*(p1.x-p2.x)+(p1.y-p2.y)*(p1.y-p2.y));
+	}  
+	
+	public static double distance2(Point p1, Point p2) {
+		return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
+	}
+	
 	public static double angle(Point e1, Point e2){//resultat en radian
         double dx = e2.x-e1.x;
         double dy = e2.y - e1.y;
@@ -15,13 +25,6 @@ public class Utils {
         return dy<0 ? 2*Math.PI-res: res;
     }   
 
-    public static double distance(Point p1,Point p2){
-        return Math.sqrt((p1.x-p2.x)*(p1.x-p2.x)+(p1.y-p2.y)*(p1.y-p2.y));
-    }  
-
-	public static double distance2(Point p1, Point p2) {
-		return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
-	}
 	
     public static void  aim(Unit u, Point p,double thrust) {
     	double distance = distance(u,p);
@@ -84,7 +87,7 @@ public class Utils {
 		if (delta < 0.0) return null;
 		
 		double t =  (-b - Math.sqrt(delta)) / (2.0 * a);
-		if(t<=0.0) return null;
+		if(t<=0.0) return null;//pas de collision immediate
 		t+=from;
 		if(t>1.0)  return null;
 		
@@ -92,9 +95,30 @@ public class Utils {
 	}
 	
 	
-	
-	public static boolean collide(Unit u1, Unit u2) {
-		return distance(u1, u2) < 2*(u1.r + u2.r);
+	public static Collision getFirstCollisionFrom(List<Unit> units, double t) {
+		Collision res = null;
+		for(Unit u : units) {
+			
+			if(!u.isAlive())
+				continue;
+			
+			Collision collisionMur = CollisionMurale(u,t);
+			if( collisionMur!=null && (res==null || collisionMur.t < res.t)) {
+				res = collisionMur;
+			}
+			
+			for(Unit other : units) {
+				
+				if(!other.isAlive() || other.equals(u))
+					continue;
+				
+				Collision collision = getCollision(u, other, t);
+				if( collision!=null && (res==null || collision.t < res.t)) {
+					res = collision;
+				}
+			}
+		}
+		return res;
 	}
 	
 	

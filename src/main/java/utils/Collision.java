@@ -1,5 +1,7 @@
 package utils;
 
+import pojo.Bullet;
+import pojo.Shooter;
 import pojo.Unit;
 import pojo.Wall;
 
@@ -18,27 +20,73 @@ public class Collision{
 	
 	public void apply() {
 		
-		if( u2 instanceof Wall){
+		if(u2 instanceof Wall){//unit hits a wall
 			Wall wall = (Wall)u2;
-			
-//			u1.move(t);
-//			u1.end();
-			
-			if (wall.direction == Constants.HORIZONTAL) {
+			if (wall.direction == Constants.HORIZONTAL){
 				u1.vx = -u1.vx;
 			}
-			if (wall.direction == Constants.VERTICAL) {
+			if (wall.direction == Constants.VERTICAL){
 				u1.vy = -u1.vy;
 			}
-	
-//			u1.s.setX((int) u1.x).setY((int) u1.y);
-//			graphicEntityModule.commitEntityState(t, u1.s);
-//	
-//			u1.move(1.0 - t);
-//			u1.s.setX((int) u1.x).setY((int) u1.y);
-//			graphicEntityModule.commitEntityState(1, u1.s);
+			return;
 		}
 		
+		if(u1 instanceof Bullet){//ball hits a unit
+			((Bullet)u1).explosion();
+			if(u2 instanceof Shooter) {
+				((Shooter) u2).hp-=Constants.BULLET_DAMAGE;
+			}
+			else if(u2 instanceof Bullet){
+				((Bullet)u2).explosion();
+			}
+			return;
+		}
+		
+		if(u2 instanceof Bullet){//a unit hits a ball
+			((Bullet)u2).explosion();
+			if(u1 instanceof Shooter) {
+				((Shooter) u1).hp-=Constants.BULLET_DAMAGE;
+			}
+			else if(u1 instanceof Bullet){
+				((Bullet)u1).explosion();
+			}
+			return;
+		}
+		
+		bounce(u1,u2);//Shooter hits another Shooter
+		
 	}
+	
+	
+    public static void bounce(Unit u1, Unit u2){
+        
+        double nx = u1.x - u2.x;
+        double ny = u1.y - u2.y;
+        double nxnydeux = nx*nx + ny*ny;
+        double dvx = u1.vx - u2.vx;
+        double dvy = u1.vy - u2.vy;
+        double product = (nx*dvx + ny*dvy) / (nxnydeux * 2);
+        double fx = nx * product;
+        double fy = ny * product;
+        
 
+        u1.vx -= fx;
+        u1.vy -= fy;
+        u2.vx += fx;
+        u2.vy += fy;
+        
+  	  // Normalize vector at 100
+  	  double impulse = Math.sqrt(fx*fx + fy*fy);
+  	  if (impulse < 100.0) {
+  	      double min = 100.0 / impulse;
+  	      fx = fx * min;
+  	      fy = fy * min;
+  	  }
+  	  
+        u1.vx -= fx;
+        u1.vy -= fy;
+        u2.vx += fx;
+        u2.vy += fy;    
+     }
+    
 }
