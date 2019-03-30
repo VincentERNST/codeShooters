@@ -1,10 +1,6 @@
 package pojo;
 
-import java.util.HashMap;
-
 import com.codingame.gameengine.module.entities.Sprite;
-import com.codingame.gameengine.module.entities.Text;
-
 import view.TooltipModule;
 
 public class Unit extends Point{
@@ -44,61 +40,18 @@ public class Unit extends Point{
 		vy = (int)Math.round(f*vy);
 	}
 	
-	public void register( TooltipModule tooltipModule){
-		if(s==null){return;}
-		
-	    StringBuilder sb = new StringBuilder();
-	    sb.append("Unit ").append(this.id).append("\n")
-	      .append("x : ").append((int)this.x).append("\n")
-	      .append("y : ").append((int)this.y);
-	    
-        tooltipModule.registerEntity(s, new HashMap<>());
-        tooltipModule.updateExtraTooltipText(s, sb.toString());
+	public void register(TooltipModule tooltipModule){
+
+	}
+
+	@Override
+	public String toString() {
+		return "Unit [id=" + id + ", vx=" + vx + ", vy=" + vy + ", x=" + x + ", y=" + y + "]";
+	}
+
+	public boolean isAlive() {
+		return false;
 	}
 	
-//    public static Collision CollisionMurale(double from){
-//		double tx = 2.0;
-//		double ty = tx;
-//		
-//		double r = this.r;
-//		
-//		if(u.unitType==1 && u.y<5450  && 2050 <u.y){
-//			r=0.0;
-//		}
-//		
-//		if (u.x + u.vx < r) {
-//			tx = (r - u.x) / u.vx;
-//		} else if (u.x + u.vx > Constants.WIDTH - r) {
-//			tx = (Constants.WIDTH - r - u.x) / u.vx;
-//		}
-//
-//		if (u.y + u.vy < r) {
-//			ty = (r - u.y) / u.vy;
-//		} else if (u.y + u.vy > HEIGHT - r) {
-//			ty = (HEIGHT - r - u.y) / u.vy;
-//		}
-//
-//		int dir = -1;
-//		double t = -1.0;
-//
-//		if (tx < ty) {
-//			dir = Constants.HORIZONTAL;
-//			t = tx;
-//		} else {
-//			dir = Constants.VERTICAL;
-//			t = ty;
-//		}
-//		t+=from;
-//		if (t <= from || t > 1.0) {
-//			return null;
-//		}
-//		if (dir == Constants.HORIZONTAL) {
-//			return new Collision(u, MurH, t);
-//		} else {
-//			return new Collision(u, MurV, t);
-//		}
-//	}
-    
-    
     
 }
