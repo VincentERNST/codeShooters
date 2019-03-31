@@ -33,7 +33,7 @@ public class Utils {
         u.vy += (p.y - u.y) * coef;
     }  
     
-	public static Collision CollisionMurale(Unit u,double from){
+	public static Collision WallCollision(Unit u,double from){
     	
 		double tx = 2.0;
 		double ty = tx;
@@ -62,7 +62,7 @@ public class Utils {
 			t = ty;
 		}
 		t+=from;
-		if (t <= from || t > 1.0) {
+		if (t < from || t > 1.0) {
 			return null;
 		}
 		
@@ -70,16 +70,16 @@ public class Utils {
 		
 	}
 	
-	public static Collision getCollision(Unit Unit, Unit Unit1, double from) {
+	public static Collision getCollision(Unit unit, Unit other, double from) {
 
-		double x2 = Unit.x - Unit1.x;
-		double y2 = Unit.y - Unit1.y;
-		double r2 = Unit.r+Unit1.r;
-		double vx2 = Unit.vx - Unit1.vx;
-		double vy2 = Unit.vy - Unit1.vy;
+		double r2 = unit.r+other.r;
+		if(distance2(unit , other)<r2*r2){return null;}
+		double x2 = unit.x - other.x;
+		double y2 = unit.y - other.y;
+		double vx2 = unit.vx - other.vx;
+		double vy2 = unit.vy - other.vy;
 		double a = vx2 * vx2 + vy2 * vy2;
 		if (a <= Constants.EPSILON) return null;
-
 
 		double b = 2.0 * (x2 * vx2 + y2 * vy2);
 		double c = x2 * x2 + y2 * y2 - r2 * r2;
@@ -87,11 +87,11 @@ public class Utils {
 		if (delta < 0.0) return null;
 		
 		double t =  (-b - Math.sqrt(delta)) / (2.0 * a);
-		if(t<=0.0) return null;//pas de collision immediate
+		if(t<0.0) return null;
 		t+=from;
 		if(t>1.0)  return null;
 		
-		return new Collision(Unit, Unit1,t);
+		return new Collision(unit, other,t);
 	}
 	
 	
@@ -102,7 +102,7 @@ public class Utils {
 			if(!u.isAlive())
 				continue;
 			
-			Collision collisionMur = CollisionMurale(u,t);
+			Collision collisionMur = WallCollision(u,t);
 			if( collisionMur!=null && (res==null || collisionMur.t < res.t)) {
 				res = collisionMur;
 			}

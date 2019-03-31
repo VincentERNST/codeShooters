@@ -7,8 +7,13 @@ public class Player1 {
         int myId = scanner.nextInt();
         int[][] grid = new int[3][3];
         Random random = new Random();
-
-        while (true) {
+int turn = 0;
+     whileloop :    while (true) {
+        	turn ++;
+        	if(turn == 1){
+        		System.out.println("MOVE 774 61;SHOOT 1094 40;774 61");
+        		continue whileloop;
+        	}
             //players
             int m = scanner.nextInt();
             for(int i = 0;i<m;i++){

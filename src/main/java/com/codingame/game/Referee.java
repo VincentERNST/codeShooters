@@ -27,6 +27,10 @@ import utils.Utils;
 import view.TooltipModule;
 
 
+
+//MOVE 774 61;SHOOT 1094 40;774 61 passe à travers :( pour un radius 10 ( départ collé au mur )
+
+
 //nexts : 
 //EXPLOSION SIZING
 //HP rectangles
@@ -65,8 +69,8 @@ public class Referee extends AbstractReferee {
         	//expose avatars 
             player.sendInputLine(String.format("%d", player.getIndex() + 1));
             graphicEntityModule.createText(player.getNicknameToken())
-                    .setX(140 + (player.getIndex() % 2) * 1400)
-                    .setY(50 + 100 * (player.getIndex() / 2))
+            		.setX(150 + (player.getIndex() % 2) * Constants.WIDTH - 550* (player.getIndex() % 2) )
+                    .setY(50)
                     .setZIndex(0)
                     .setFontSize(30)
                     .setFillColor(player.getColorToken())
@@ -78,8 +82,8 @@ public class Referee extends AbstractReferee {
             
             //face
             graphicEntityModule.createSprite()
-                    .setX(100 + (player.getIndex() % 2) * 1400)
-                    .setY(90 + 100 * (player.getIndex() / 2))
+                    .setX(100 + (player.getIndex() % 2) * Constants.WIDTH - 200* (player.getIndex() % 2) )
+                    .setY(100)
                     .setZIndex(20)
                     .setScale(2*Constants.PLAYER_RADIUS/100)
                     .setImage(player.getAvatarToken())
@@ -87,8 +91,8 @@ public class Referee extends AbstractReferee {
             
             //encircle face
             graphicEntityModule.createCircle()
-	            .setX(100 + (player.getIndex() % 2) * 1400)
-	            .setY(90 + 100 * (player.getIndex() / 2))
+	            .setX(100 + (player.getIndex() % 2) * Constants.WIDTH - 200* (player.getIndex() % 2) )
+	            .setY(100)
 	            .setRadius((int)(0.5*(Math.sqrt(2))*Constants.PLAYER_RADIUS -1))
 	            .setLineWidth(2)
 	            .setZIndex(501)
@@ -97,6 +101,8 @@ public class Referee extends AbstractReferee {
             
             //create units
             players[player.getIndex()] = UnitFactory.createShooter(Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4,3*Constants.HEIGHT/4 -2*(player.getIndex() ) * Constants.HEIGHT/4,0,0);
+            players[player.getIndex()].staticHealthBar = graphicEntityModule.createRectangle().setFillColor(0xE41515).setWidth(Constants.PLAYER_HP).setHeight(8).setY(50).setX(50).setZIndex(10);
+            players[player.getIndex()].dynamicHealthBar = graphicEntityModule.createRectangle().setFillColor(0x00FF00).setWidth(Constants.PLAYER_HP).setHeight(8).setY(50).setX(50).setZIndex(11);
             
             //create player sprite
             Sprite s = graphicEntityModule.createSprite()

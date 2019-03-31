@@ -14,8 +14,8 @@ public class Shooter extends Unit{
 	public Text message;
 	public int hp;
 	public Circle circle;
-	Rectangle staticHealthBar;
-	Rectangle dynamicHealthBar;
+	public Rectangle staticHealthBar;
+	public Rectangle dynamicHealthBar;
 	
 	public Shooter(int id, int x, int y, int vx, int vy) {
 		super(id,x,y,vx,vy,Constants.PLAYER_RADIUS,Constants.PLAYER_AMORT);
