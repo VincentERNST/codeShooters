@@ -10,5 +10,6 @@ public class Vortex extends Unit{
 	
 	public void attract(ArrayList<Unit> units) {
 		
+		
 	}
 }
