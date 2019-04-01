@@ -10,6 +10,7 @@ import com.codingame.gameengine.core.AbstractReferee;
 import com.codingame.gameengine.core.GameManager;
 import com.codingame.gameengine.core.Tooltip;
 import com.codingame.gameengine.module.entities.Circle;
+import com.codingame.gameengine.module.entities.Curve;
 import com.codingame.gameengine.module.entities.GraphicEntityModule;
 import com.codingame.gameengine.module.entities.Rectangle;
 import com.codingame.gameengine.module.entities.Sprite;
@@ -101,8 +102,13 @@ public class Referee extends AbstractReferee {
             
             //create units
             players[player.getIndex()] = UnitFactory.createShooter(Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4,3*Constants.HEIGHT/4 -2*(player.getIndex() ) * Constants.HEIGHT/4,0,0);
-            players[player.getIndex()].staticHealthBar = graphicEntityModule.createRectangle().setFillColor(0xE41515).setWidth(Constants.PLAYER_HP).setHeight(8).setY(50).setX(50).setZIndex(10);
-            players[player.getIndex()].dynamicHealthBar = graphicEntityModule.createRectangle().setFillColor(0x00FF00).setWidth(Constants.PLAYER_HP).setHeight(8).setY(50).setX(50).setZIndex(11);
+            
+            players[player.getIndex()].staticHealthBar = graphicEntityModule.createRectangle().setFillColor(0xE41515).setWidth(Constants.PLAYER_HP).setHeight(8)
+            		.setY(110).setX(100 +(int)Constants.PLAYER_RADIUS + (player.getIndex() % 2) * Constants.WIDTH -Constants.PLAYER_HP*(player.getIndex() % 2)  - 200* (player.getIndex() % 2)-2*(player.getIndex() % 2)*((int)Constants.PLAYER_RADIUS) )
+            		.setZIndex(10);
+            players[player.getIndex()].dynamicHealthBar = graphicEntityModule.createRectangle().setFillColor(0x00FF00).setWidth(Constants.PLAYER_HP).setHeight(8)
+            		.setY(110).setX(100 +(int)Constants.PLAYER_RADIUS + (player.getIndex() % 2) * Constants.WIDTH -Constants.PLAYER_HP*(player.getIndex() % 2)  - 200* (player.getIndex() % 2)-2*(player.getIndex() % 2)*((int)Constants.PLAYER_RADIUS) )
+            		.setZIndex(11);
             
             //create player sprite
             Sprite s = graphicEntityModule.createSprite()
@@ -163,7 +169,6 @@ public class Referee extends AbstractReferee {
     
     @Override
     public void gameTurn(int turn) {//turn from 0 to end
-    	
     	System.err.println(" turn : "+turn);
 
         //send players inputs
@@ -256,12 +261,15 @@ public class Referee extends AbstractReferee {
         	staticHealthBar = graphicEntityModule.createRectangle().setFillColor(0xE41515).setWidth(Constants.PLAYER_HP).setHeight(8).setY(50).setX(50).setZIndex(10);
         }
         if(dynamicHealthBar==null) {
-        	dynamicHealthBar = graphicEntityModule.createRectangle().setFillColor(0x00FF00).setWidth(players[0].hp).setHeight(8).setY(50).setX(50).setZIndex(11);
+        	dynamicHealthBar = graphicEntityModule.createRectangle().setFillColor(0x00FF00).setWidth(Constants.PLAYER_HP).setHeight(8).setY(500).setX(50).setZIndex(11);
         }
         
         graphicEntityModule.commitEntityState(0, staticHealthBar);
         graphicEntityModule.commitEntityState(0, dynamicHealthBar);
-        dynamicHealthBar.setScaleX(Math.min(1.0,Math.max(0,(double)Math.max(0,players[0].hp)/Constants.PLAYER_HP)));
+//        dynamicHealthBar.setScaleX(0.5,Curve.NONE);
+        dynamicHealthBar.setX(51);
+        graphicEntityModule.commitEntityState(0.5, dynamicHealthBar);
+        dynamicHealthBar.setX(200);
         graphicEntityModule.commitEntityState(1, dynamicHealthBar);
         
         
@@ -305,17 +313,20 @@ public class Referee extends AbstractReferee {
 
 
 	private void computeAOE() {
-    	for(Bullet b : bullets) {
-    		if(b.tic==0) {
-    			for(Shooter p : players) {
-    				if(Utils.distance(b, p)<Constants.EXPLOSION_RADIUS+Constants.PLAYER_RADIUS){
-    					p.hp-=Constants.BULLET_AOE_DAMAGE;
-    				}
+		for(Shooter p : players) {
+			boolean getHit = false;
+			for(Bullet b : bullets) {
+    			if(b.tic==0 && Utils.distance(b, p)<Constants.EXPLOSION_RADIUS+Constants.PLAYER_RADIUS){
+    				p.hp-=Constants.BULLET_AOE_DAMAGE;
+    				p.s.setImage("Damaged.png");
+    				getHit = true;
     			}
     		}
+			if(!getHit) {
+				p.s.setImage("alienspaceship.png");
+			}
     	}
 	}
-
 
 
 
@@ -345,15 +356,22 @@ public class Referee extends AbstractReferee {
 		
 		double t=0.0;
 		System.err.println("   new collisions contest ");
-    	while(t<1.0){
+		int round =1;
+    	while(t<1.0 && round <100){
     		System.err.println("-------- round : "+t+"  -----------------");
+    		round ++;
     		Collision c = Utils.getFirstCollisionFrom(units,t);
     		
-    		if( c!=null && c.t>t){
+    		if( c!=null && c.t>=t){
+    			if(c.t==t) {
+    				System.err.println("COLLSION IMMEDIATE !!");
+    			}
     			System.err.println(c.u1);
     			System.err.println(c.u2);
     			moveAll(units, t,  c.t-t);
     			c.apply();
+    			
+    			
     			System.err.println(c.u1);
     			System.err.println(c.u2);
     			t= c.t;
@@ -398,8 +416,8 @@ public class Referee extends AbstractReferee {
 		for(Unit unit : units) {
 			if(!unit.isAlive())
 				continue;
-			unit.move(duration);
 			
+			unit.move(duration);
 			if( unit instanceof Shooter) {
 				updateSprites((Shooter)unit,from+duration);
 			}
@@ -441,9 +459,12 @@ public class Referee extends AbstractReferee {
 		p.s.setRotation(Utils.angle(p, new Point(p.x+p.vx, p.y+p.vy)));
 		p.message.setX((int) p.x).setY((int) p.y- (int)Constants.PLAYER_RADIUS-10);
 		p.circle.setX((int) p.x).setY((int) p.y);
-		commit(t,p);
+		graphicEntityModule.commitEntityState(t, p.s);
 //		graphicEntityModule.commitEntityState(t, p.message);//dont let comment go out of map
 		graphicEntityModule.commitEntityState(t, p.circle);
+		
+		p.dynamicHealthBar.setScaleX(Math.min(1.0,Math.max(0,(double)Math.max(0,p.hp)/Constants.PLAYER_HP))+t*Constants.EPSILON);//t factor allows to bypass unexpected interpolation
+		graphicEntityModule.commitEntityState(t, p.dynamicHealthBar);
 	}
     
 	

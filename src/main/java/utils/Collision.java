@@ -35,6 +35,8 @@ public class Collision{
 			((Bullet)u1).explosion();
 			if(u2 instanceof Shooter) {
 				((Shooter) u2).hp-=Constants.BULLET_DAMAGE;
+				((Shooter) u2).s.setImage("damaged.png");
+//				((Shooter) u2).dynamicHealthBar.setWidth(((Shooter) u2).hp);
 			}
 			else if(u2 instanceof Bullet){
 				((Bullet)u2).explosion();
@@ -46,6 +48,8 @@ public class Collision{
 			((Bullet)u2).explosion();
 			if(u1 instanceof Shooter) {
 				((Shooter) u1).hp-=Constants.BULLET_DAMAGE;
+				((Shooter) u1).s.setImage("Damaged.png");
+//				((Shooter) u1).dynamicHealthBar.setWidth(((Shooter) u1).hp);
 			}
 			else if(u1 instanceof Bullet){
 				((Bullet)u1).explosion();
@@ -54,7 +58,7 @@ public class Collision{
 		}
 		
 		bounce(u1,u2);//Shooter hits another Shooter
-		
+		  
 	}
 	
 	
