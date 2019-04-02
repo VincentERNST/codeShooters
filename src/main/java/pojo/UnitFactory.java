@@ -2,6 +2,7 @@ package pojo;
 
 import utils.Constants;
 
+//TODO MOve toi Utils package
 public class UnitFactory {
 	static int shooterNbr;
 	static int bulletNbr;
