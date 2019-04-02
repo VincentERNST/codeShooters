@@ -33,14 +33,14 @@ import view.TooltipModule;
 
 
 //nexts : 
-//EXPLOSION SIZING
-//HP rectangles
+//AFFICHER HP
 //Vortex :D
 //Winning conditions
 //Burning ship
 //BackGround
 //Refactor much
 //unlimited ball
+
 
 //Wood3 shoots
 //Wood2 2 pods
@@ -54,11 +54,12 @@ public class Referee extends AbstractReferee {
     private List<Bullet> bullets = new ArrayList<Bullet>();
     private Shooter[] players = new Shooter[Constants.NUMBER_OF_PLAYERS];
     private TooltipModule tooltipModule;
-    
+    private static Text hp1;
+    private static Text hp2;
     @Override
     public Properties init(Properties params) {
     	  tooltipModule = new TooltipModule(gameManager);
-        graphicEntityModule.createSprite()
+    	  graphicEntityModule.createSprite()
                 .setImage("Background.jpg")
                 .setAnchor(0);
         
@@ -73,7 +74,6 @@ public class Referee extends AbstractReferee {
                     .setFontSize(30)
                     .setFillColor(player.getColorToken())
                     .setAnchor(0);
-            
             
            
            
@@ -100,6 +100,9 @@ public class Referee extends AbstractReferee {
             //create units
             players[player.getIndex()] = UnitFactory.createShooter(Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4,3*Constants.HEIGHT/4 -2*(player.getIndex() ) * Constants.HEIGHT/4,0,0);
             
+            
+            
+            //create hp bars
             players[player.getIndex()].staticHealthBar = graphicEntityModule.createRectangle().setFillColor(0xE41515).setWidth(Constants.PLAYER_HP).setHeight(8)
             		.setY(110).setX(100 +(int)Constants.PLAYER_RADIUS + (player.getIndex() % 2) * Constants.WIDTH -Constants.PLAYER_HP*(player.getIndex() % 2)  - 200* (player.getIndex() % 2)-2*(player.getIndex() % 2)*((int)Constants.PLAYER_RADIUS) )
             		.setZIndex(10);
@@ -107,7 +110,7 @@ public class Referee extends AbstractReferee {
             		.setY(110).setX(100 +(int)Constants.PLAYER_RADIUS + (player.getIndex() % 2) * Constants.WIDTH -Constants.PLAYER_HP*(player.getIndex() % 2)  - 200* (player.getIndex() % 2)-2*(player.getIndex() % 2)*((int)Constants.PLAYER_RADIUS) )
             		.setZIndex(11);
             
-            //create player sprite
+            //create ship sprite
             Sprite s = graphicEntityModule.createSprite()
 			.setX(Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4 )
 			.setY(3*Constants.HEIGHT/4 -2*(player.getIndex() ) * Constants.HEIGHT/4)
@@ -132,16 +135,6 @@ public class Referee extends AbstractReferee {
             
             
            //create circle around player's sihp
-           //plain version
-//            graphicEntityModule.createCircle()
-//	            .setX((int)players[player.getIndex()].x)
-//	            .setY((int)players[player.getIndex()].y)
-//	            .setRadius((int)(0.25*(1+Math.sqrt(2))*Constants.PLAYER_RADIUS))
-//	            .setFillAlpha(0)
-//	            .setLineWidth((int)(0.5*(-1+Math.sqrt(2))*Constants.PLAYER_RADIUS))
-//	            .setZIndex(501)
-//	            .setLineColor(player.getColorToken());
-            
             Circle circle = graphicEntityModule.createCircle()
             .setX((int)players[player.getIndex()].x)
             .setY((int)players[player.getIndex()].y)
@@ -156,6 +149,20 @@ public class Referee extends AbstractReferee {
             players[player.getIndex()].circle=circle;
             
         }
+        //set up hp counts
+        hp1 = graphicEntityModule.createText("100")
+        		.setX(165 +2*(int)Constants.PLAYER_RADIUS )
+        		.setY(100)
+                .setFontSize(30)
+                .setFillColor(gameManager.getPlayers().get(0).getColorToken())
+                .setAnchor(0);
+        
+        hp2 = graphicEntityModule.createText("100")
+        		.setX(Constants.WIDTH - 220 - 2*(int)Constants.PLAYER_RADIUS)
+        		.setY(100)
+                .setFontSize(30)
+                .setFillColor(gameManager.getPlayers().get(1).getColorToken())
+                .setAnchor(0);;
         
         gameManager.setFrameDuration(500);
         return params;
@@ -167,7 +174,7 @@ public class Referee extends AbstractReferee {
     @Override
     public void gameTurn(int turn) {//turn from 0 to end
     	System.err.println(" turn : "+turn);
-
+    	updateHps();
         //send players inputs
     	for(Player player : gameManager.getPlayers()) {
 	        player.sendInputLine(String.format("%d", Constants.NUMBER_OF_PLAYERS));
@@ -261,7 +268,7 @@ public class Referee extends AbstractReferee {
             gameManager.endGame();
         }
         //check tie
-        if(turn > 15) {
+        if(turn > 50) {
         	gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
         	//TODO tie breaker
         	gameManager.getPlayer(0).setScore(1);
@@ -275,9 +282,11 @@ public class Referee extends AbstractReferee {
     	
 		for (int i=bullets.size()-1; i>=0 ; i--){
 			Bullet b = bullets.get(i);
-			if(b.tic<0) {
-//				b.s.setVisible(false);
+			if(b.tic==-1) {
 				b.fade();
+			}
+			if(b.tic==-2) {
+				b.s.setVisible(false);
 				bullets.remove(b);
 			}
 		}
@@ -287,6 +296,14 @@ public class Referee extends AbstractReferee {
 				s.hideSprites();
 			}
 		}
+	}
+
+
+
+
+	private void updateHps() {
+		hp1.setText(players[0].hp+"");
+		hp2.setText(players[1].hp+"");
 		
 	}
 

@@ -31,6 +31,7 @@ public class Shooter extends Unit{
 		circle.setVisible(false);
 		message.setVisible(false);
 		s.setVisible(false);
+		dynamicHealthBar.setScaleX(0.);
 	}
 	
 	@Override
