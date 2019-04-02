@@ -1,6 +1,8 @@
-package pojo;
+package utils;
 
-import utils.Constants;
+import pojo.Bullet;
+import pojo.Shooter;
+import pojo.Wall;
 
 //TODO MOve toi Utils package
 public class UnitFactory {

@@ -21,9 +21,9 @@ import pojo.Bullet;
 import pojo.Point;
 import pojo.Shooter;
 import pojo.Unit;
-import pojo.UnitFactory;
 import utils.Collision;
 import utils.Constants;
+import utils.UnitFactory;
 import utils.Utils;
 import view.TooltipModule;
 
@@ -204,7 +204,7 @@ public class Referee extends AbstractReferee {
 					int targetMoveX = Integer.parseInt(move.split(" ")[1]);
 					int targetMoveY = Integer.parseInt(move.split(" ")[2]);
 					gameManager.addToGameSummary(String.format("Player %s played Move (%d %d) ", player.getNicknameToken(),targetMoveX,targetMoveY));
-					Utils.aim(players[ player.getIndex() ]  , new Point(targetMoveX , targetMoveY),100.0);
+					Utils.aim(players[ player.getIndex() ]  , new Point(targetMoveX , targetMoveY),Constants.PLAYER_THRUST);
 	//				players[player.getIndex()].message.setText(targetMoveX+ " "+targetMoveY);
 				}
 				else{
