@@ -21,5 +21,7 @@ public class Vortex extends Unit{
 			u.vy-= attractionForce*Math.sin(angle);
 		}
 		
+//		MIN(Constants.VORTEX_THRUST/ (Utils.dis / 1000)2, 10 )
+		
 	}
 }

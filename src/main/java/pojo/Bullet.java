@@ -1,7 +1,6 @@
 package pojo;
 
 import java.util.HashMap;
-
 import utils.Constants;
 import view.TooltipModule;
 
@@ -26,10 +25,17 @@ public class Bullet extends Unit{
 		this.tic=0;
 	}
 	
+	public void fade() {
+		s.setAlpha(0.1)
+		.setImage("smoke.png")
+		.setScale(2+2*Constants.EXPLOSION_RADIUS/100);
+	}
+	
 	public void initSprite() {
         s.setVisible(true)
         .setX((int) x)
         .setY((int) y)
+        .setAlpha(1)
         .setImage("bille.png")
         .setScale(2*Constants.BULLET_RADIUS/100)
         .setAnchor(0.5);  
