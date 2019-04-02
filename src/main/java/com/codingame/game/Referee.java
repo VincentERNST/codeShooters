@@ -42,7 +42,6 @@ import view.TooltipModule;
 //Refactor much
 //unlimited ball
 
-
 //Wood3 shoots
 //Wood2 2 pods
 //Wood1 Repair
@@ -55,8 +54,6 @@ public class Referee extends AbstractReferee {
     private List<Bullet> bullets = new ArrayList<Bullet>();
     private Shooter[] players = new Shooter[Constants.NUMBER_OF_PLAYERS];
     private TooltipModule tooltipModule;
-  	static Rectangle staticHealthBar;
-    static Rectangle dynamicHealthBar;
     
     @Override
     public Properties init(Properties params) {
@@ -256,23 +253,6 @@ public class Referee extends AbstractReferee {
         computeAOE();
         computeDeaths();
         
-        //TODO HP BARS
-        if(staticHealthBar==null) {
-        	staticHealthBar = graphicEntityModule.createRectangle().setFillColor(0xE41515).setWidth(Constants.PLAYER_HP).setHeight(8).setY(50).setX(50).setZIndex(10);
-        }
-        if(dynamicHealthBar==null) {
-        	dynamicHealthBar = graphicEntityModule.createRectangle().setFillColor(0x00FF00).setWidth(Constants.PLAYER_HP).setHeight(8).setY(500).setX(50).setZIndex(11);
-        }
-        
-        graphicEntityModule.commitEntityState(0, staticHealthBar);
-        graphicEntityModule.commitEntityState(0, dynamicHealthBar);
-//        dynamicHealthBar.setScaleX(0.5,Curve.NONE);
-        dynamicHealthBar.setX(51);
-        graphicEntityModule.commitEntityState(0.5, dynamicHealthBar);
-        dynamicHealthBar.setX(200);
-        graphicEntityModule.commitEntityState(1, dynamicHealthBar);
-        
-        
         // check winner
         int winner = checkWinner();
         if (winner > 0 ) {
@@ -296,7 +276,8 @@ public class Referee extends AbstractReferee {
 		for (int i=bullets.size()-1; i>=0 ; i--){
 			Bullet b = bullets.get(i);
 			if(b.tic<0) {
-				b.s.setVisible(false);
+//				b.s.setVisible(false);
+				b.fade();
 				bullets.remove(b);
 			}
 		}
@@ -463,7 +444,7 @@ public class Referee extends AbstractReferee {
 //		graphicEntityModule.commitEntityState(t, p.message);//dont let comment go out of map
 		graphicEntityModule.commitEntityState(t, p.circle);
 		
-		p.dynamicHealthBar.setScaleX(Math.min(1.0,Math.max(0,(double)Math.max(0,p.hp)/Constants.PLAYER_HP))+t*Constants.EPSILON);//t factor allows to bypass unexpected interpolation
+		p.dynamicHealthBar.setScaleX(Math.min(1.0,Math.max(0,(double)Math.max(0,p.hp)/Constants.PLAYER_HP)) +t*Constants.EPSILON);//t factor allows to bypass unexpected interpolation
 		graphicEntityModule.commitEntityState(t, p.dynamicHealthBar);
 	}
     
