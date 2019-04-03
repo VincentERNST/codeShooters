@@ -1,6 +1,6 @@
 package pojo;
 
-import java.util.ArrayList;
+import java.util.List;
 import utils.Constants;
 import utils.Utils;
 
@@ -10,18 +10,20 @@ public class Vortex extends Unit{
 		super(id,x,y,0,0, r,0.);
 	}
 	
-	public void attract(ArrayList<Unit> units) {
-	 //TOSO vortexPower / d  equivalent 100.0 (player thrust) et 10
+	public void attract(List<Unit> units) {
 		for(Unit u: units){
 			if(!u.isAlive())
 				continue;
 			double angle = Utils.angle(this,u);
-			double attractionForce = Constants.VORTEX_THRUST;
+			double d2 = Utils.distance2(this, u);
+			if(d2<r*r) {
+				d2=r*r;
+			}
+			double attractionForce = Math.max(Constants.VORTEX_THRUST/(d2/10000) , 50. );
+			System.err.println(Math.sqrt(d2)+"   attracts  "+attractionForce);
 			u.vx-= attractionForce*Math.cos(angle);
 			u.vy-= attractionForce*Math.sin(angle);
 		}
-		
-//		MIN(Constants.VORTEX_THRUST/ (Utils.dis / 1000)2, 10 )
-		
 	}
+	
 }

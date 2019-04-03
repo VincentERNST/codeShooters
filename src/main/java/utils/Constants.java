@@ -16,11 +16,11 @@ public final class Constants {
 	public static double PLAYER_AMORT = 0.9;
 	public static int PLAYER_HP = 100;
 	public static final double PLAYER_THRUST = 100.;
-	public static final double VORTEX_THRUST = 100.;
+	public static final double VORTEX_THRUST = 1000.;
 	public static double BULLET_RADIUS = 10.0;
 	public static double PLAYER_RADIUS = 60.0;
 	public static double EXPLOSION_RADIUS = 200.0;
-	public static int BULLET_DAMAGE = 30;
+	public static int BULLET_DAMAGE = 10;
 	public static int BULLET_AOE_DAMAGE = 2;
 	public static int PLAYER_BASE_HP = 100;
 	public static Point center = new Point(WIDTH/2,HEIGHT/2);
