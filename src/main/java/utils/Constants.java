@@ -5,6 +5,7 @@ import pojo.Point;
 public final class Constants {
 	
 	public static int NUMBER_OF_PLAYERS = 2;
+	public static int NUMBER_OF_SHIPS = 2;
 	public static int WIDTH = 1920;
 	public static int HEIGHT = 1080;
 	public static int HORIZONTAL = 0;
@@ -18,7 +19,7 @@ public final class Constants {
 	public static final double PLAYER_THRUST = 100.;
 	public static final double VORTEX_THRUST = 1000.;
 	public static double BULLET_RADIUS = 10.0;
-	public static double PLAYER_RADIUS = 60.0;
+	public static double PLAYER_RADIUS = 50.0;//60
 	public static double EXPLOSION_RADIUS = 200.0;
 	public static int BULLET_DAMAGE = 10;
 	public static int BULLET_AOE_DAMAGE = 2;

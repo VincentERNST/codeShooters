@@ -52,14 +52,17 @@ public class Referee extends AbstractReferee {
     @Inject private GraphicEntityModule graphicEntityModule;
 
     private List<Bullet> bullets = new ArrayList<Bullet>();
-    private Shooter[] players = new Shooter[Constants.NUMBER_OF_PLAYERS];
+    private Shooter[] players = new Shooter[Constants.NUMBER_OF_PLAYERS * Constants.NUMBER_OF_SHIPS];
     private TooltipModule tooltipModule;
-    private static Text hp1;
-    private static Text hp2;
+    private static Text hp11;
+    private static Text hp12;
+    private static Text hp21;
+    private static Text hp22;
     private static Vortex vortex= new Vortex(-1, Constants.WIDTH/2, Constants.HEIGHT/2,200.0);
     
     @Override
     public Properties init(Properties params) {
+    	  //backGround
     	  tooltipModule = new TooltipModule(gameManager);
     	  graphicEntityModule.createSprite()
                 .setImage("Background.jpg")
@@ -78,6 +81,8 @@ public class Referee extends AbstractReferee {
     	  for (Player player : gameManager.getPlayers()) {
         	//expose avatars 
             player.sendInputLine(String.format("%d", player.getIndex() + 1));
+            
+            //Name
             graphicEntityModule.createText(player.getNicknameToken())
             		.setX(150 + (player.getIndex() % 2) * Constants.WIDTH - 550* (player.getIndex() % 2) )
                     .setY(50)
@@ -85,9 +90,6 @@ public class Referee extends AbstractReferee {
                     .setFontSize(30)
                     .setFillColor(player.getColorToken())
                     .setAnchor(0);
-            
-           
-           
             
             //face
             graphicEntityModule.createSprite()
@@ -98,7 +100,7 @@ public class Referee extends AbstractReferee {
                     .setImage(player.getAvatarToken())
                     .setAnchor(0.5);
             
-            //encircle face
+            //Encircle face
             graphicEntityModule.createCircle()
 	            .setX(100 + (player.getIndex() % 2) * Constants.WIDTH - 200* (player.getIndex() % 2) )
 	            .setY(100)
@@ -108,73 +110,85 @@ public class Referee extends AbstractReferee {
 	            .setLineColor(player.getColorToken());
             
             
-            //create units
-            players[player.getIndex()] = UnitFactory.createShooter(Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4,3*Constants.HEIGHT/4 -2*(player.getIndex() ) * Constants.HEIGHT/4,0,0);
-            
-            
-            
-            //create hp bars
-            players[player.getIndex()].staticHealthBar = graphicEntityModule.createRectangle().setFillColor(0xE41515).setWidth(Constants.PLAYER_HP).setHeight(8)
-            		.setY(110).setX(100 +(int)Constants.PLAYER_RADIUS + (player.getIndex() % 2) * Constants.WIDTH -Constants.PLAYER_HP*(player.getIndex() % 2)  - 200* (player.getIndex() % 2)-2*(player.getIndex() % 2)*((int)Constants.PLAYER_RADIUS) )
-            		.setZIndex(100);
-            players[player.getIndex()].dynamicHealthBar = graphicEntityModule.createRectangle().setFillColor(0x00FF00).setWidth(Constants.PLAYER_HP).setHeight(8)
-            		.setY(110).setX(100 +(int)Constants.PLAYER_RADIUS + (player.getIndex() % 2) * Constants.WIDTH -Constants.PLAYER_HP*(player.getIndex() % 2)  - 200* (player.getIndex() % 2)-2*(player.getIndex() % 2)*((int)Constants.PLAYER_RADIUS) )
-            		.setZIndex(100);
-            
-            //create ship sprite
-            Sprite s = graphicEntityModule.createSprite()
-			.setX(Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4 )
-			.setY(3*Constants.HEIGHT/4 -2*(player.getIndex() ) * Constants.HEIGHT/4)
-                    .setZIndex(20)
-                    .setImage("alienspaceship.png")
-                    .setScale(2*Constants.PLAYER_RADIUS/100)
-                    .setAnchor(0.5);
-            
-            players[player.getIndex()].s=s;
-            players[player.getIndex()].register(tooltipModule);
-            
-            
-            //create message sprite for players
-            String text = player.getIndex()==0 ? ":)" : ":(";
-            Text msg = graphicEntityModule.createText(text)
-                    .setX((int)players[player.getIndex()].x)
-                    .setY((int)players[player.getIndex()].y - (int)Constants.PLAYER_RADIUS-10)
-                    .setZIndex(500)
-                    .setFontSize((int)(Constants.PLAYER_RADIUS/2))
-                    .setFillColor(0xFFAC59)
-                    .setAnchor(0.5);
-            
-            
-           //create circle around player's face
-            Circle circle = graphicEntityModule.createCircle()
-            .setX((int)players[player.getIndex()].x)
-            .setY((int)players[player.getIndex()].y)
-            .setRadius((int)(Constants.PLAYER_RADIUS -1))
-            .setFillAlpha(0.15)
-            .setFillColor(player.getColorToken())
-            .setLineWidth(2)
-            .setZIndex(20)
-            .setLineColor(player.getColorToken()); 
-            
-            players[player.getIndex()].message=msg;
-            players[player.getIndex()].circle=circle;
-            
+            for(int i = 0; i<Constants.NUMBER_OF_SHIPS ; i++) {
+	            
+	            //create units
+            	System.err.println("building  : "+(player.getIndex()+2*i));
+	            players[player.getIndex()+2*i] = UnitFactory.createShooter(Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4,3*Constants.HEIGHT/4 -2*((1-i)*player.getIndex()) * Constants.HEIGHT/4,0,0);
+
+	            //create hp bars
+	            players[player.getIndex()+2*i].staticHealthBar = graphicEntityModule.createRectangle().setFillColor(0xE41515).setWidth(Constants.PLAYER_HP).setHeight(8)
+	            		.setY(110+i*50).setX(100 +(int)Constants.PLAYER_RADIUS + (player.getIndex() % 2) * Constants.WIDTH -Constants.PLAYER_HP*(player.getIndex() % 2)  - 200* (player.getIndex() % 2)-2*(player.getIndex() % 2)*((int)Constants.PLAYER_RADIUS) )
+	            		.setZIndex(100);
+	            players[player.getIndex()+2*i].dynamicHealthBar = graphicEntityModule.createRectangle().setFillColor(0x00FF00).setWidth(Constants.PLAYER_HP).setHeight(8)
+	            		.setY(110+i*50).setX(100 +(int)Constants.PLAYER_RADIUS + (player.getIndex() % 2) * Constants.WIDTH -Constants.PLAYER_HP*(player.getIndex() % 2)  - 200* (player.getIndex() % 2)-2*(player.getIndex() % 2)*((int)Constants.PLAYER_RADIUS) )
+	            		.setZIndex(100);
+	            
+	            //create ship sprite
+	            Sprite s = graphicEntityModule.createSprite()
+				.setX(Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4 )
+				.setY(3*Constants.HEIGHT/4 -2*(player.getIndex()+i)* Constants.HEIGHT/4)
+	                    .setZIndex(20)
+	                    .setImage("alienspaceship.png")
+	                    .setScale(2*Constants.PLAYER_RADIUS/100)
+	                    .setAnchor(0.5);
+	            
+	            players[player.getIndex()+2*i].s=s;
+	            players[player.getIndex()+2*i].register(tooltipModule);
+	            
+	            
+	            //create message sprite for players
+	            String text = player.getIndex()==0 ? ":)" : ":(";
+	            Text msg = graphicEntityModule.createText(text)
+	                    .setX((int)players[player.getIndex()+2*i].x)
+	                    .setY((int)players[player.getIndex()+2*i].y - (int)Constants.PLAYER_RADIUS-10)
+	                    .setZIndex(500)
+	                    .setFontSize((int)(Constants.PLAYER_RADIUS/2))
+	                    .setFillColor(0xFFAC59)
+	                    .setAnchor(0.5);
+	            players[player.getIndex()+2*i].message=msg;
+	            
+	            
+	           //create circle around player's face
+	            Circle circle = graphicEntityModule.createCircle()
+	            .setX((int)players[player.getIndex()+2*i].x)
+	            .setY((int)players[player.getIndex()+2*i].y)
+	            .setRadius((int)(Constants.PLAYER_RADIUS -1))
+	            .setFillAlpha(0.15)
+	            .setFillColor(player.getColorToken())
+	            .setLineWidth(2)
+	            .setZIndex(20)
+	            .setLineColor(player.getColorToken()); 
+	            players[player.getIndex()+2*i].circle=circle;
+            } 
         }
         //set up hp counts
-        hp1 = graphicEntityModule.createText("100")
+        hp11 = graphicEntityModule.createText("100")
         		.setX(165 +2*(int)Constants.PLAYER_RADIUS )
         		.setY(100)
                 .setFontSize(30)
                 .setFillColor(gameManager.getPlayers().get(0).getColorToken())
                 .setAnchor(0);
+        hp12 = graphicEntityModule.createText("100")
+        		.setX(165 +2*(int)Constants.PLAYER_RADIUS )
+        		.setY(150)
+        		.setFontSize(30)
+        		.setFillColor(gameManager.getPlayers().get(0).getColorToken())
+        		.setAnchor(0);
         
-        hp2 = graphicEntityModule.createText("100")
+        hp21 = graphicEntityModule.createText("100")
         		.setX(Constants.WIDTH - 220 - 2*(int)Constants.PLAYER_RADIUS)
         		.setY(100)
                 .setFontSize(30)
                 .setFillColor(gameManager.getPlayers().get(1).getColorToken())
                 .setAnchor(0);;
-        
+        hp22 = graphicEntityModule.createText("100")
+                	.setX(Constants.WIDTH - 220 - 2*(int)Constants.PLAYER_RADIUS)
+                	.setY(150)
+                	.setFontSize(30)
+                	.setFillColor(gameManager.getPlayers().get(1).getColorToken())
+                	.setAnchor(0);;
+                		
         gameManager.setFrameDuration(500);
         return params;
     }
@@ -187,8 +201,9 @@ public class Referee extends AbstractReferee {
     	
     	System.err.println(" turn : "+turn);
     	vortex.s.setRotation(((turn+1)%4)*0.5*Math.PI);
-    	
     	updateHps();
+    	
+    	
         //send players inputs
     	for(Player player : gameManager.getPlayers()) {
 	        player.sendInputLine(String.format("%d", Constants.NUMBER_OF_PLAYERS));
@@ -317,8 +332,10 @@ public class Referee extends AbstractReferee {
 
 
 	private void updateHps() {
-		hp1.setText(players[0].hp+"");
-		hp2.setText(players[1].hp+"");
+		hp11.setText(players[0].hp+"");
+		hp12.setText(players[2].hp+"");
+		hp21.setText(players[1].hp+"");
+		hp22.setText(players[3].hp+"");
 		
 	}
 
