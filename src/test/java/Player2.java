@@ -41,6 +41,7 @@ public class Player2 {
              
 
              System.out.println(String.format("MOVE %d %d;SHOOT %d %d;"+mx+" "+my,mx ,my,x,y ));
+             System.out.println(String.format("MOVE %d %d;SHOOT %d %d;"+mx+" "+my,mx ,my,x,y ));
         }
     }
 }
