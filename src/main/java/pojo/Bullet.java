@@ -35,6 +35,7 @@ public class Bullet extends Unit{
         s.setVisible(true)
         .setX((int) x)
         .setY((int) y)
+        .setZIndex(2)
         .setAlpha(1)
         .setImage("bille.png")
         .setScale(2*Constants.BULLET_RADIUS/100)
