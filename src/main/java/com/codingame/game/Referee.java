@@ -79,7 +79,8 @@ public class Referee extends AbstractReferee {
     				.setZIndex(1);
     	  
     	  for (Player player : gameManager.getPlayers()) {
-        	//expose avatars 
+        	
+    		//WhatTrickeryIsThis ?
             player.sendInputLine(String.format("%d", player.getIndex() + 1));
             
             //Name
@@ -114,7 +115,7 @@ public class Referee extends AbstractReferee {
 	            
 	            //create units
             	System.err.println("building  : "+(player.getIndex()+2*i));
-	            players[player.getIndex()+2*i] = UnitFactory.createShooter(Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4,3*Constants.HEIGHT/4 -2*((1-i)*player.getIndex()) * Constants.HEIGHT/4,0,0);
+	            players[player.getIndex()+2*i] = UnitFactory.createShooter(Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4,  Constants.HEIGHT/4*(4*i*player.getIndex()+3-2*i-2*player.getIndex()),  0,0);
 
 	            //create hp bars
 	            players[player.getIndex()+2*i].staticHealthBar = graphicEntityModule.createRectangle().setFillColor(0xE41515).setWidth(Constants.PLAYER_HP).setHeight(8)
@@ -127,7 +128,7 @@ public class Referee extends AbstractReferee {
 	            //create ship sprite
 	            Sprite s = graphicEntityModule.createSprite()
 				.setX(Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4 )
-				.setY(3*Constants.HEIGHT/4 -2*(player.getIndex()+i)* Constants.HEIGHT/4)
+				.setY(Constants.HEIGHT/4*(4*i*player.getIndex()+3-2*i-2*player.getIndex()))
 	                    .setZIndex(20)
 	                    .setImage("alienspaceship.png")
 	                    .setScale(2*Constants.PLAYER_RADIUS/100)
