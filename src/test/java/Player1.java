@@ -12,6 +12,7 @@ int turn = 0;
         	turn ++;
         	if(turn == 1){
         		System.out.println("MOVE 774 61;SHOOT 1094 40;774 61");
+        		System.out.println("MOVE 774 61;SHOOT 1094 40;774 61");
         		continue whileloop;
         	}
             //players
@@ -43,6 +44,7 @@ int turn = 0;
              int  my = random.nextInt(1080);
              
 
+            System.out.println(String.format("MOVE %d %d;SHOOT %d %d;"+mx+" "+my,mx ,my,x,y ));
             System.out.println(String.format("MOVE %d %d;SHOOT %d %d;"+mx+" "+my,mx ,my,x,y ));
         }
     }

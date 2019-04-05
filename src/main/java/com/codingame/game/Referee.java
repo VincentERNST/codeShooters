@@ -10,6 +10,7 @@ import com.codingame.gameengine.core.AbstractReferee;
 import com.codingame.gameengine.core.GameManager;
 import com.codingame.gameengine.core.Tooltip;
 import com.codingame.gameengine.module.entities.Circle;
+import com.codingame.gameengine.module.entities.Curve;
 import com.codingame.gameengine.module.entities.GraphicEntityModule;
 import com.codingame.gameengine.module.entities.Sprite;
 import com.codingame.gameengine.module.entities.Text;
@@ -58,14 +59,15 @@ public class Referee extends AbstractReferee {
     private static Text hp12;
     private static Text hp21;
     private static Text hp22;
+    private static Sprite backGround;
     private static Vortex vortex= new Vortex(-1, Constants.WIDTH/2, Constants.HEIGHT/2,200.0);
     
     @Override
     public Properties init(Properties params) {
     	  //backGround
     	  tooltipModule = new TooltipModule(gameManager);
-    	  graphicEntityModule.createSprite()
-                .setImage("Background.jpg")
+    	  backGround = graphicEntityModule.createSprite()
+                .setImage("Omega_Centauri.jpg")
                 .setAnchor(0);
         
     	  
@@ -203,7 +205,7 @@ public class Referee extends AbstractReferee {
     	System.err.println(" turn : "+turn);
     	vortex.s.setRotation(((turn+1)%4)*0.5*Math.PI);
     	updateHps();
-    	
+    	backGround.setAlpha(0.5+0.2*(turn%2));
     	
         //send players inputs
     	for(Player player : gameManager.getPlayers()) {
@@ -222,65 +224,73 @@ public class Referee extends AbstractReferee {
 	        
 	    for(Player player : gameManager.getPlayers()) {      
 	        player.execute();
-	        Unit unit= players[player.getIndex()];
+	        
 	        
 	        gameManager.addTooltip(new Tooltip(player.getIndex() ,   player.getNicknameToken()+" has fired a bullet")); //TODO TOOLTIP EVENT Progress bar
+	        
+	        
+	        
 	        // Read outputs
 	        try {
-	            String[] output = player.getOutputs().get(0).split(";");
-	            
-	            //move commands
-	            String move = output[0];
-	            if(move.equals("WAIT")){
-	            	gameManager.addToGameSummary(String.format("Player %s is waiting ", player.getNicknameToken()));
-	            }
-				else if (move.split(" ")[0].equals("MOVE")) {
-					int targetMoveX = Integer.parseInt(move.split(" ")[1]);
-					int targetMoveY = Integer.parseInt(move.split(" ")[2]);
-					gameManager.addToGameSummary(String.format("Player %s played Move (%d %d) ", player.getNicknameToken(),targetMoveX,targetMoveY));
-					Utils.aim(players[ player.getIndex() ]  , new Point(targetMoveX , targetMoveY),Constants.PLAYER_THRUST);
-	//				players[player.getIndex()].message.setText(targetMoveX+ " "+targetMoveY);
-				}
-				else{
-					throw new Exception(" MOVE command is not properly set");
-				}      
-	            
-	            //shoot
-	            String shoot = output[1];
-				if (shoot.split(" ")[0].equals("SHOOT")) {
-					int targetShootX = Integer.parseInt(shoot.split(" ")[1]);
-					int targetShootY = Integer.parseInt(shoot.split(" ")[2]);
-					gameManager.addToGameSummary(String.format("Player %s played shoot (%d %d) ", player.getNicknameToken(), targetShootX, targetShootY));
+	            for(int i =0; i <player.getExpectedOutputLines();i++) {
+	            	String out = player.getOutputs().get(i);  
+	            	String[] output = out.split(";");
+	            	Unit unit= players[player.getIndex()+2*i];
+	            	if( !unit.isAlive())continue;
+		            //move commands
+		            String move = output[0];
+		            if(move.equals("WAIT")){
+		            	gameManager.addToGameSummary(String.format("Player %s is waiting ", player.getNicknameToken()));
+		            }
+					else if (move.split(" ")[0].equals("MOVE")) {
+						int targetMoveX = Integer.parseInt(move.split(" ")[1]);
+						int targetMoveY = Integer.parseInt(move.split(" ")[2]);
+						gameManager.addToGameSummary(String.format("Player %s played Move (%d %d) ", player.getNicknameToken(),targetMoveX,targetMoveY));
+						Utils.aim(unit  , new Point(targetMoveX , targetMoveY),Constants.PLAYER_THRUST);
+		//				players[player.getIndex()].message.setText(targetMoveX+ " "+targetMoveY);
+					}
+					else{
+						throw new Exception(" MOVE command is not properly set");
+					}      
+		            
+		            //shoot
+		            String shoot = output[1];
+					if (shoot.split(" ")[0].equals("SHOOT")) {
+						int targetShootX = Integer.parseInt(shoot.split(" ")[1]);
+						int targetShootY = Integer.parseInt(shoot.split(" ")[2]);
+						gameManager.addToGameSummary(String.format("Player %s played shoot (%d %d) ", player.getNicknameToken(), targetShootX, targetShootY));
+						
+			            Bullet b = UnitFactory.createBullet((int)unit.x, (int)unit.y,unit.vx,unit.vy);
+			            Point target = new Point(targetShootX , targetShootY);
+			            Utils.aim(b, new Point(targetShootX , targetShootY),300.0);
+			            bullets.add(b);
+			            draw(b,target);
+					}
+					else{
+						throw new Exception(" SHOOT command is not properly set");
+					}     
 					
-		            Bullet b = UnitFactory.createBullet((int)unit.x, (int)unit.y,players[ player.getIndex() ].vx, players[ player.getIndex() ].vy);
-		            Point target = new Point(targetShootX , targetShootY);
-		            Utils.aim(b, new Point(targetShootX , targetShootY),300.0);
-		            bullets.add(b);
-		            draw(b,target);
-				}
-				else{
-					throw new Exception(" SHOOT command is not properly set");
-				}     
-				
-				//comment 
-				if(output.length>2) {
-					players[player.getIndex()].message.setText(output[2]);
-				}
-	        } catch (NumberFormatException e) {
-	            player.deactivate("Wrong output!");
-	            player.setScore(-1);
-	            gameManager.endGame();
-	        } catch (TimeoutException e) {
-	            gameManager.addToGameSummary(GameManager.formatErrorMessage(player.getNicknameToken() + " timeout!"));
-	            player.deactivate(player.getNicknameToken() + " timeout!");
-	            player.setScore(-1);
-	            gameManager.endGame();
-	        }catch (Exception e) {
-	            gameManager.addToGameSummary(GameManager.formatErrorMessage(player.getNicknameToken() + e.getMessage()));
-	            player.deactivate(player.getNicknameToken() + " timeout!");
-	            player.setScore(-1);
-	            gameManager.endGame();
-	        }
+					//comment 
+					if(output.length>2) {
+						players[player.getIndex()+2*i].message.setText(output[2]);
+					}
+	            }
+		       } catch (NumberFormatException e) {
+		           player.deactivate("Wrong output!");
+		           player.setScore(-1);
+		           gameManager.endGame();
+		       } catch (TimeoutException e) {
+		           gameManager.addToGameSummary(GameManager.formatErrorMessage(player.getNicknameToken() + " timeout!"));
+		           player.deactivate(player.getNicknameToken() + " timeout!");
+		           player.setScore(-1);
+		           gameManager.endGame();
+		       }catch (Exception e) {
+		           gameManager.addToGameSummary(GameManager.formatErrorMessage(player.getNicknameToken() + e.getMessage()));
+		           player.deactivate(player.getNicknameToken() + " timeout!");
+		           player.setScore(-1);
+		           gameManager.endGame();
+		       }
+		        
     	}
         
         //apply moves
@@ -333,17 +343,18 @@ public class Referee extends AbstractReferee {
 
 
 	private void updateHps() {
+		//player1
 		hp11.setText(players[0].hp+"");
 		hp12.setText(players[2].hp+"");
+		//player2
 		hp21.setText(players[1].hp+"");
 		hp22.setText(players[3].hp+"");
 		
 	}
 
 
-
-
 	private void computeAOE() {
+		//shooters get damaged
 		for(Shooter p : players) {
 			boolean getHit = false;
 			for(Bullet b : bullets) {
@@ -357,6 +368,22 @@ public class Referee extends AbstractReferee {
 				p.s.setImage("alienspaceship.png");
 			}
     	}
+		
+		
+		//chain reactions
+		for(Bullet b1 : bullets) {
+			if(b1.tic!=0)
+				continue;
+			for(Bullet b2 : bullets) {
+				if(!b2.isAlive())
+					continue;
+				if(b1.tic==0 && Utils.distance(b1, b2)<Constants.EXPLOSION_RADIUS+Constants.BULLET_RADIUS){
+					b2.tic=1;
+				}
+			}
+		}
+		
+		
 	}
 
 
@@ -402,7 +429,6 @@ public class Referee extends AbstractReferee {
     			System.err.println(c.u2);
     			moveAll(units, t,  c.t-t);
     			c.apply();
-    			
     			
     			System.err.println(c.u1);
     			System.err.println(c.u2);
