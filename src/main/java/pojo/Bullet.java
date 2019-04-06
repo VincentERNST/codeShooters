@@ -19,7 +19,7 @@ public class Bullet extends Unit{
 	}
 	
 	public void explosion() {
-		s.setImage("explosion2.png").setScale(2*Constants.EXPLOSION_RADIUS/100).setZIndex(2);
+		s.setImage("explosion2.png").setScale(2*Constants.EXPLOSION_RADIUS/100).setZIndex(3);
 		vx=0.;
 		vy=0.;
 		this.tic=0;
@@ -28,6 +28,7 @@ public class Bullet extends Unit{
 	public void fade() {
 		s.setAlpha(0.1)
 		.setImage("smoke.png")
+		.setZIndex(2)
 		.setScale(2+2*Constants.EXPLOSION_RADIUS/100);
 	}
 	
@@ -35,7 +36,7 @@ public class Bullet extends Unit{
         s.setVisible(true)
         .setX((int) x)
         .setY((int) y)
-        .setZIndex(3)
+        .setZIndex(4)
         .setAlpha(1)
         .setImage("bille.png")
         .setScale(2*Constants.BULLET_RADIUS/100)

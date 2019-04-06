@@ -19,7 +19,7 @@ public class Vortex extends Unit{
 			if(d2<r*r) {
 				d2=r*r;
 			}
-			double attractionForce = Math.max(Constants.VORTEX_THRUST/(d2/10000) , 50. );
+			double attractionForce = Math.max(Constants.VORTEX_THRUST/(d2/20000) , 10. );
 			System.err.println(Math.sqrt(d2)+"   attracts  "+attractionForce);
 			u.vx-= attractionForce*Math.cos(angle);
 			u.vy-= attractionForce*Math.sin(angle);

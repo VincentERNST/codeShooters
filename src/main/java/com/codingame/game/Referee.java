@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
+
 import com.codingame.gameengine.core.AbstractPlayer.TimeoutException;
 import com.codingame.gameengine.core.AbstractReferee;
 import com.codingame.gameengine.core.GameManager;
@@ -33,16 +35,10 @@ import view.TooltipModule;
 
 
 //nexts : 
-//missile
-//2 ships
-//heal
-//Winning conditions
-//RIP IMAGE
-//BackGround
 //Refactor much
 //TODOs
 
-
+//Rules order : 
 //Wood3 shoots
 //Wood2 2 people
 //Wood1 heal / missile
@@ -225,18 +221,14 @@ public class Referee extends AbstractReferee {
 	    for(Player player : gameManager.getPlayers()) {      
 	        player.execute();
 	        
-	        
-	        gameManager.addTooltip(new Tooltip(player.getIndex() ,   player.getNicknameToken()+" has fired a bullet")); //TODO TOOLTIP EVENT Progress bar
-	        
-	        
-	        
 	        // Read outputs
 	        try {
 	            for(int i =0; i <player.getExpectedOutputLines();i++) {
 	            	String out = player.getOutputs().get(i);  
 	            	String[] output = out.split(";");
-	            	Unit unit= players[player.getIndex()+2*i];
-	            	if( !unit.isAlive())continue;
+	            	Shooter unit= players[player.getIndex()+2*i];
+	            	Shooter friend= players[player.getIndex()+2*(1-i)];
+	            	if(!unit.isAlive())continue;
 		            //move commands
 		            String move = output[0];
 		            if(move.equals("WAIT")){
@@ -262,12 +254,21 @@ public class Referee extends AbstractReferee {
 						
 			            Bullet b = UnitFactory.createBullet((int)unit.x, (int)unit.y,unit.vx,unit.vy);
 			            Point target = new Point(targetShootX , targetShootY);
-			            Utils.aim(b, new Point(targetShootX , targetShootY),300.0);
+			            Utils.aim(b, new Point(targetShootX , targetShootY),Constants.BULLET_THRUST);
 			            bullets.add(b);
 			            draw(b,target);
 					}
+					else if (shoot.split(" ")[0].equals("HEAL")) {
+						if(!friend.isAlive()){
+							gameManager.addToGameSummary(String.format("Player %s played HEAL without effect since ally is dead", player.getNicknameToken()));
+						}
+						else{
+							friend.heal();
+							gameManager.addToGameSummary(String.format("Player %s played HEAL", player.getNicknameToken()));
+						}
+					}
 					else{
-						throw new Exception(" SHOOT command is not properly set");
+						throw new Exception(" Secound command is not properly set");
 					}     
 					
 					//comment 
@@ -302,24 +303,20 @@ public class Referee extends AbstractReferee {
         
         
         // check winner
-        int winner = checkWinner();
-        if (winner > 0 ) {
-            gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(winner).getNicknameToken() + " won!"));
-            gameManager.getPlayer(winner - 1).setScore(1);
-            gameManager.endGame();
-        }
+        checkWinner(turn);
+        
         //check tie
-        if(turn > 50) {
-        	gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
-        	//TODO tie breaker
-        	gameManager.getPlayer(0).setScore(1);
-        	gameManager.getPlayer(1).setScore(1);
-        	gameManager.endGame();
+        if(turn > Constants.GAME_TURN) {
+        	tieBreaker();
         }
         
     }
-    
-    private void computeDeaths() {
+
+
+
+
+
+	private void computeDeaths() {
     	
 		for (int i=bullets.size()-1; i>=0 ; i--){
 			Bullet b = bullets.get(i);
@@ -333,7 +330,8 @@ public class Referee extends AbstractReferee {
 		}
 		
 		for(Shooter s : players) {
-			if(!s.isAlive()) {
+			if(!s.isAlive() && s.s.isVisible()) {
+		        gameManager.addTooltip(new Tooltip(s.id%2 ,   gameManager.getPlayers().get(s.id%2).getNicknameToken()+" Has Lost a Ship")); //TODO TOOLTIP EVENT Progress bar
 				s.hideSprites();
 			}
 		}
@@ -356,6 +354,8 @@ public class Referee extends AbstractReferee {
 	private void computeAOE() {
 		//shooters get damaged
 		for(Shooter p : players) {
+			if(!p.isAlive())
+				continue;
 			boolean getHit = false;
 			for(Bullet b : bullets) {
     			if(b.tic==0 && Utils.distance(b, p)<Constants.EXPLOSION_RADIUS+Constants.PLAYER_RADIUS){
@@ -388,10 +388,50 @@ public class Referee extends AbstractReferee {
 
 
 
-	private int checkWinner() {
-    	return 0;
+	private void checkWinner(int turn) {
+		boolean win0=false,win1 =false;
+		int winner = -1;
+		if(!players[0].isAlive() && !players[2].isAlive()){
+			win1=true;winner = 1;
+		}
+		if(!players[1].isAlive() && !players[3].isAlive()){
+			win0=true;winner = 0;
+		}
+		if( win0 && win1 ){
+			gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
+			gameManager.endGame();
+			return;
+		}
+		if(win1 || win0){
+			gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(winner).getNicknameToken() + " won!"));
+			gameManager.getPlayer(winner).setScore(1);
+			gameManager.endGame();
+		}
     }
-	
+
+    
+    private void tieBreaker() {
+    	gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
+    	//tie breaker
+    	int player0Hps = 0,player1Hps = 0;
+    	player0Hps+= players[0].isAlive()? players[0].hp : 0;
+    	player0Hps+= players[2].isAlive()? players[0].hp : 0;
+    	player1Hps+= players[1].isAlive()? players[1].hp : 0;
+    	player1Hps+= players[3].isAlive()? players[3].hp : 0;
+    	
+    	if(player0Hps>player1Hps){
+			gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(0).getNicknameToken() + " won on HP tie breaker!"));
+    	}
+    	if(player0Hps<player1Hps){
+    		gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(1).getNicknameToken() + " won on HP tie breaker!"));
+    	}
+    	if(player0Hps==player1Hps){
+    		gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
+    	}
+    	
+    	gameManager.endGame();
+	}
+    
 	private void ticBullets() {
 
 		for (int i=bullets.size()-1; i>=0 ; i--){

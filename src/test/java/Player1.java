@@ -15,11 +15,17 @@ int turn = 0;
         		System.out.println("MOVE 774 61;SHOOT 1094 40;774 61");
         		continue whileloop;
         	}
+        	if(turn%5 == 3){
+        		System.out.println("MOVE 774 61;HEAL");
+        		System.out.println("MOVE 774 61;HEAL");
+        		continue whileloop;
+        	}
+        	
             //players
             int m = scanner.nextInt();
             for(int i = 0;i<m;i++){
             	int x = scanner.nextInt();
-            	int y = scanner.nextInt();
+            	int y = scanner.nextInt(); 
             	int vx = scanner.nextInt();
             	int vy = scanner.nextInt();
             	System.err.println(x+"  "+y+" "+vx+" "+vy);

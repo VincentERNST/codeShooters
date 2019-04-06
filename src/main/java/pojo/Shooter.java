@@ -19,7 +19,7 @@ public class Shooter extends Unit{
 	
 	public Shooter(int id, int x, int y, int vx, int vy) {
 		super(id,x,y,vx,vy,Constants.PLAYER_RADIUS,Constants.PLAYER_AMORT);
-		hp=Constants.PLAYER_BASE_HP;
+		hp=Constants.PLAYER_HP;
 	}
 	
 	@Override
@@ -47,6 +47,11 @@ public class Shooter extends Unit{
 	    
         tooltipModule.registerEntity(s, new HashMap<>());
         tooltipModule.updateExtraTooltipText(s, sb.toString());
+	}
+
+	public void heal() {
+		hp+=Constants.HEAL;
+		s.setImage("healed.png");
 	}
 	
 }
