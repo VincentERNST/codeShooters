@@ -5,9 +5,8 @@ public class Player1 {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int myId = scanner.nextInt();
-        int[][] grid = new int[3][3];
         Random random = new Random();
-int turn = 0;
+        int turn = 0;
      whileloop :    while (true) {
         	turn ++;
         	if(turn == 1){
@@ -24,22 +23,25 @@ int turn = 0;
             //players
             int m = scanner.nextInt();
             for(int i = 0;i<m;i++){
+            	int id = scanner.nextInt();
+            	int owner= scanner.nextInt();
             	int x = scanner.nextInt();
             	int y = scanner.nextInt(); 
             	int vx = scanner.nextInt();
             	int vy = scanner.nextInt();
-            	System.err.println(x+"  "+y+" "+vx+" "+vy);
+            	int hp = scanner.nextInt();
             }           
             
             
             //bullets
             int n = scanner.nextInt();
             for(int i = 0;i<n;i++){
+            	int id = scanner.nextInt();
             	int bulletX = scanner.nextInt();
             	int bulletY = scanner.nextInt();
             	int bulletVX = scanner.nextInt();
             	int bulletVY = scanner.nextInt();
-            	System.err.println(bulletX+"  "+bulletY);
+            	int tic = scanner.nextInt();
             }
             
             

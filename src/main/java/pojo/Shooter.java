@@ -11,14 +11,16 @@ import view.TooltipModule;
 
 public class Shooter extends Unit{
 	
+	public int owner;
 	public Text message;
 	public int hp;
 	public Circle circle;
 	public Rectangle staticHealthBar;
 	public Rectangle dynamicHealthBar;
 	
-	public Shooter(int id, int x, int y, int vx, int vy) {
+	public Shooter(int id, int owner, int x, int y, int vx, int vy) {
 		super(id,x,y,vx,vy,Constants.PLAYER_RADIUS,Constants.PLAYER_AMORT);
+		this.owner=owner;
 		hp=Constants.PLAYER_HP;
 	}
 	
@@ -27,7 +29,9 @@ public class Shooter extends Unit{
 		return hp>0;
 	}
 	
-	public void hideSprites() {
+	public void die() {
+		x=-1;vx=0;
+		y=-1;vy=0;
 		circle.setVisible(false);
 		message.setVisible(false);
 		s.setVisible(false);
@@ -53,5 +57,6 @@ public class Shooter extends Unit{
 		hp+=Constants.HEAL;
 		s.setImage("healed.png");
 	}
+
 	
 }

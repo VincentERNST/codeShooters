@@ -15,7 +15,7 @@ public class Utils {
 		return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
 	}
 	
-	public static double angle(Point e1, Point e2){//resultat en radian
+	public static double angle(Point e1, Point e2){//radian
         double dx = e2.x-e1.x;
         double dy = e2.y - e1.y;
         double d = distance(e1,e2);
@@ -26,6 +26,9 @@ public class Utils {
 
 	
     public static void  aim(Unit u, Point p,double thrust) {
+    	if(u.x==p.x && u.y==p.y){
+    		return;
+    	}
     	double distance = distance(u,p);
         double coef = (thrust) / distance;
         u.vx += (p.x - u.x) * coef;
