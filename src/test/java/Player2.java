@@ -74,6 +74,10 @@ public class Player2 {
             		continue;
             	}
             	
+            	if(turn%5==3){
+            		System.out.println(String.format("MOVE %d %d;SHOOT %d %d; Shoot "+e.x+" "+e.y,aimX , aimY,(int)s.x ,(int)s.y));
+            		continue;
+            	}           	
             	System.out.println(String.format("MOVE %d %d;SHOOT %d %d; Shoot "+e.x+" "+e.y,aimX , aimY,(int)e.x ,(int)e.y));
             }
              

@@ -14,7 +14,7 @@ public final class Constants {
 	public static double EPSILON = 0.00001;
 	public static int BULLET_POOL_SIZE = 36;
 	
-	public static int PLAYER_HP = 100;
+	public static int BASE_PLAYER_HP = 100;
 	public static double PLAYER_AMORT = 0.7;
 	public static final double PLAYER_THRUST = 80.;
 	public static double PLAYER_RADIUS = 50.0;//60
