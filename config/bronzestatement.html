@@ -25,7 +25,7 @@
                 Summary of new rules
             </p>
             <span class="statement-league-alert-content">
-	          Starting from the bronze league each hero has <const>3</const> unique skills.<br />
+	          Starting from the bronze league <const>Vortex</const> comes into the fray<br />
 				This is the last rule change.<br />
 				See the updated statement for details.
 	      </span>
@@ -41,7 +41,7 @@
             </h1>
             <div class="statement-goal-content">
                 <!-- LEAGUES wood3 wood2 wood1 bronze -->
-                Destroy your opponent's tower.
+                Destroy your opponent's ships, or end up with more total HP.
             </div>
         </div>
 
@@ -54,39 +54,29 @@
             </h1>
             <div><div class="statement-rules-content">
 
-                <p>The game is played on a map <const>1920 </const>units wide and <const>750</const> units high with 2 players.<br>
+                <p>The game is played on a map <const>1920 </const>units wide and <const>1080</const> units high with 2 players.<br>
                     The coordinate <const>X=0</const>,<const> Y=0</const> is the top left pixel.</p>
 
                 <!-- BEGIN wood3 wood2 -->
-                <p>Each player controls <const>2</const> heroes of their choice, which they pick before the game begins by outputting each hero’s name.</p>
-
-                <p>Both players pick their first hero simultaneously and then pick their second hero simultaneously, so they can adjust their second hero pick based on their opponent’s first hero pick.</p>
+                <p>Each player controls <const>2</const> Ships with <const>100</const> HP.</p>
+                <p>During a turn, each Ship is supposed to move and either apply a shoot or a repair.</p>
                 <!-- END -->
+                
+                <p>The Balls have a <const>6</const>turns timer. They hit for <const>10</const> damage on direct collision, and  <const>2</const> on area of effect damage.</p>
+                <p>The Repair heals for <const>5</const> HP. It applies on ally Ship.</p>
 
-
-                <p>The teams start out on opposite sides of the road stretching along the map.</p>
-
-                <p>An allied tower is placed for each team next to their starting position. Each player must protect their own tower, while trying to destroy their opponent's tower.</p>
-
-                <p>Every <const>15</const> turns a wave of allied units spawns for each player next to their tower, to aid them in battle against their opponent. These units will head straight for the enemy tower, but will stop to fight any enemy they encounter in their path.</p>
-
- <!-- BEGIN wood1 bronze-->
-                <p>A random amount of neutral creatures, between <const>3</const> and <const>5</const>,  will spawn amongst the bushes above the road. They won't attack anyone, unless they are attacked.</p>
+ 				<!-- BEGIN  bronze-->
+                <p>The Vortex drags every units to center every beginning of turn. The closer to center unit is, the stronger vortex pull is.</p>
                 <!-- END -->
 
                 <br>
-
-                <p><strong>The Heroes</strong><br>
+                <p><strong>The Ships</strong><br>
                     <br>
-
                     You can select from following heroes:<br>
-                    <action>DEADPOOL</action> <br>
-                    <action>DOCTOR_STRANGE</action><br>
-                    <action>HULK</action><br>
-                    <action>IRONMAN</action> <br>
-                    <action>VALKYRIE</action><br></p>
-
-<br>
+                    <action>WAIT</action> <br>
+                    <action>SHOOT</action><br>
+                    <action>HEAL</action><br></p>
+					<br>
 
 <!-- BEGIN wood2-->
                 When your heroes kill enemy units, enemy heroes or even neutral creatures, you gain gold which you can use to buy equipment that will instantly make them more powerful.</p>
@@ -167,8 +157,10 @@
 
                 <p><strong>Collisions</strong><br>
                     <br>
-
-                    There are no collisions between units.</p><br>
+					All collisions are elastic. For technical reasons, a minimal impulse of 100 is applied to colliding entities if their speed is too low (doesn't apply when colliding with map edges).</p><br>
+					<br>
+					When a ball collides with an other ball, speed reset to <const>0</const>, it explodes. 
+					When a ball collides with a Ship, ball speed reset to <const>0</const>, it explodes, Ship loses HP. Ship speed is not affected. 
 
                 <p><strong>Round types</strong><br>
                     <br>
