@@ -12,7 +12,7 @@ public final class Constants {
 	public static int HORIZONTAL = 0;
 	public static int VERTICAL = 1;
 	public static double EPSILON = 0.00001;
-	public static int BULLET_POOL_SIZE = 36;
+	public static int BOMB_POOL_SIZE = 36;
 	
 	public static int BASE_PLAYER_HP = 100;
 	public static double PLAYER_AMORT = 0.7;
@@ -20,15 +20,18 @@ public final class Constants {
 	public static double PLAYER_RADIUS = 50.0;//60
 	
 	
-	public static int BULLET_TIC = 6;
-	public static double BULLET_RADIUS = 10.0;
-	public static double BULLET_AMORT = 0.8;
-	public static int BULLET_DAMAGE = 10;
-	public static double EXPLOSION_RADIUS = 200.0;
-	public static double BULLET_THRUST = 200.0;
-	public static int BULLET_AOE_DAMAGE = 2;
+	public static int BOMB_TIC = 6;
+	public static double BOMB_RADIUS = 10.0;
+	public static double BOMB_AMORT = 0.8;
+	public static int BOMB_DAMAGE = 10;
+	public static double EXPLOSION_RADIUS = 150.0;
+	public static double BOMB_THRUST = 200.0;
+	public static int BOMB_AOE_DAMAGE = 2;
 	
 	public static final double VORTEX_THRUST = 300.;
+	
+	public static int FIRST_TURN = 200;
+	
 	
 	public static int HEAL = 5;
 	public static Point center = new Point(WIDTH/2,HEIGHT/2);

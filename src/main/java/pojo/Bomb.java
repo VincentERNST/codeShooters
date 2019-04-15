@@ -4,13 +4,13 @@ import java.util.HashMap;
 import utils.Constants;
 import view.TooltipModule;
 
-public class Bullet extends Unit{
+public class Bomb extends Unit{
 	
 	public int tic;
 	
-	public Bullet(int id, int x, int y) {
-		super(id,x,y,0,0,Constants.BULLET_RADIUS,Constants.BULLET_AMORT);
-		this.tic=Constants.BULLET_TIC;
+	public Bomb(int id, int x, int y) {
+		super(id,x,y,0,0,Constants.BOMB_RADIUS,Constants.BOMB_AMORT);
+		this.tic=Constants.BOMB_TIC;
 	}
 	
 	@Override
@@ -39,7 +39,7 @@ public class Bullet extends Unit{
         .setZIndex(4)
         .setAlpha(1)
         .setImage("bille.png")
-        .setScale(2*Constants.BULLET_RADIUS/100)
+        .setScale(2*Constants.BOMB_RADIUS/100)
         .setAnchor(0.5);  
 	}
 	
@@ -47,7 +47,7 @@ public class Bullet extends Unit{
 	public void register(TooltipModule tooltipModule){//TODO different registering MORPH
 		
 	    StringBuilder sb = new StringBuilder();
-	    sb.append("Bullet ").append(this.id).append("\n")
+	    sb.append("Bomb ").append(this.id).append("\n")
 	      .append("x : ").append((int)this.x).append("\n")
 	      .append("y : ").append((int)this.y).append("\n")
 	      .append("vx : ").append((int)this.vx).append("\n")
