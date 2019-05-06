@@ -1,8 +1,5 @@
 <div id="statement_back" class="statement_back" style="display:none"></div>
 
-
-
-
         <div class="statement-body">
 
 
@@ -41,7 +38,7 @@
             </h1>
             <div class="statement-goal-content">
                 <!-- LEAGUES wood3 wood2 wood1 bronze -->
-                Destroy your opponent's ships, or end up with more total HP.
+                Destroy your opponent's ships or end up with more total HP.
             </div>
         </div>
 
@@ -58,11 +55,11 @@
                     The coordinate <const>X=0</const>,<const> Y=0</const> is the top left pixel.</p>
 
                 <!-- BEGIN wood3 wood2 -->
-                <p>Each player controls <const>2</const> Ships with <const>100</const> HP.</p>
+                <p>Each player controls <const>2</const> Ships with <const>100</const>HP.</p>
                 <p>During a turn, each Ship is supposed to move and either apply a shoot or a repair.</p>
                 <!-- END -->
                 
-                <p>The Bombs have a <const>6</const>turns timer. They hit for <const>10</const> damage on direct collision, and  <const>2</const> on area of effect damage.</p>
+                <p>The Bombs have a <const>6</const> turns timer. They hit for <const>10</const> damage on direct collision, and  <const>2</const> on area of effect damage.</p>
                 <p>The Repair heals for <const>5</const> HP. It applies on ally Ship.</p>
 
  				<!-- BEGIN  bronze-->
@@ -72,7 +69,7 @@
                 <br>
                 <p><strong>The Ships</strong><br>
                     <br>
-                    Ships have a discs of radius <const>50</const>. They start at <const>100</const>HP. They move with a <const>200</const> thrust. Ships can do actions : <br>
+                    Ships have a discs of radius <const>50</const>. They start at <const>100</const>HP. They move with a <const>200</const> thrust.<br> Ships can do actions : <br>
                     <ul>
                 <li><action>WAIT</action> <br></li>
                     <li><action>SHOOT x y</action>: Throw a Bomb from Ship position towards x y<br></li>
@@ -84,12 +81,10 @@
                     <br>
                     Bombs act like bombs starting with <const>6</const> timer
                     Bombs explode at end of timer or at collision with an other entity, dealing <const>10</const> direct damage to Ships and <const>2</const> additional area of effect damage at the end of turn.
-                    
 					<br>				
 
                    <p><strong>The Vortex</strong><br>
-                    <br>
-                    Vortex is roughly placed at center of map (960; 540). It has <const>200</const> radius.
+                    <br>Vortex is roughly placed at center of map (960; 540). It has <const>200</const> radius.
                     It applies a dragging force at end of turn.
                     Any entity that goes across the vortex radius is swallowed and removed from the game  
                     					<br>				
@@ -122,11 +117,7 @@
                         <div class="text">
                             <ul>
                                 <li>Lose all ship</li>
-                            </ul>
-                            <ul>
                                 <li>Output wrong command</li>
-                            </ul>                           
-                            <ul>
                                 <li>Have less total HP(tie break)</li>
                             </ul>                           
                         </div>
@@ -135,6 +126,7 @@
             </div>
         </div>
 
+<br>
 
         <!-- EXPERT RULES -->
         <div class="statement-section statement-expertrules">
@@ -151,10 +143,12 @@
 					<br>
 					When a Bomb collides with an other Bomb, speed reset to <const>0</const>, it explodes. 
 					When a Bomb collides with a Ship, Bomb speed reset to <const>0</const>, it explodes, Ship loses HP. Ship speed is not affected. 
+					</p>
 <br><br>
                 <p><strong>Moves</strong><br>
                     <br>Thrust adds to speed vector before each moves.
-					<br>Frictions applies at end of turn.
+					<br>Frictions applies at end of turn on speed vector : v = f*v.
+					<br>Rounding : positions and speed vectors are rounded at end of turn : v=(int)Math.round(v)</p>
 <br><br>
 
                 <p><strong>Ship</strong><br>
@@ -165,73 +159,36 @@
                    <br>Friction : <const>0.7</const>
                    <br>Radius : <const>50</const>
                    <br>Base HP : <const>100</const>
+                   </p>
 <br><br>
 
                 <p><strong>Bomb</strong><br>
                     <br>
-
+                    
                    Bombs characteristics are as follow :
                    <br>Friction : <const>0.8</const>
                    <br>Radius: <const>50</const>
                    <br>Explosion radius : <const>150</const>
-                   <br>Bombs aquire the speed of their luncher, plus shooter thrust.
+                   <br>Impact Damage: <const>10</const>
+                   <br>Area of effect damage : <const>10</const>
+                   <br>Bombs aquire the speed of their luncher, plus shooter thrust. Whenever Bombs explode, their speed is set to zero.
+                   </p>
 <br><br>
 
                 <p><strong>Vortex</strong><br>
                    <br>
                    Vortex has <const>200</const> radius
-                   <br>Given d2 square distance between Vortex and entity, Vortex applies a thurst <strong>attractionForce = Math.max( 300/(d2/20000) , 10.0 )</strong>. It is going from entity to Vortex center.
+                   <br>Given d2 square distance between Vortex and entity,
+                   <br> Vortex applies a thurst <strong>attractionForce = Math.max( 300/(d2/20000) , 10.0 )</strong>. 
+                   <br>It is going from entity to Vortex center.
                    <br>When entity collides with Vortex (edge to edge). It is trashed into Vortex center. 
                    
+</p>
 
-<table style="width:100%; border: 1px solid white; ">
-<th>
-Entity Type
-</th>
-<th>
-Gold Reward
-</th>
-<tr>
-<td>
-Melee Unit
-</td>
-<td>
-30
-</td>
-</tr>
-<tr>
-<td>
-Ranged Unit
-</td>
-<td>
-50
-</td>
-</tr>
-<tr>
-<td>
-Hero
-</td>
-<td>
-300
-</td>
-</tr>
-<tr>
-<td>
-Denied Hero
-</td>
-<td>
-150
-</td>
-</tr>
-<tr>
-<td>
-Groot
-</td>
-<td>
-100 - first spawn
-</td>
-</tr>
-</table>
+
+</div>
+
+
 
                     </p><br>
 
@@ -247,62 +204,36 @@ Groot
             <div class="blk">
                 <div class="title">Initialization input</div>
                 <div class="text"><span class="statement-lineno">Line 1:</span> your <var>team</var>’s number, can be either 0 or 1.<br>
-                    <span class="statement-lineno">Line 2:</span><var>bushAndSpawnPointCount</var> the number of bushes and spawn points<br><br>
-
-                    <span class="statement-lineno">Next <var>bushAndSpawnPointCount</var> lines:</span> String entityType [Bush, Spawn], Integer <var>x</var>, Integer <var>y</var>, Integer <var>radius</var><br><br>
-
-                    <span class="statement-lineno">Next Line:</span> <var>itemCount</var> the total number of items available in game.<br>
-                    <span class="statement-lineno">Next <var>itemCount</var> lines:</span>
-                    <ul>
-                        <li>String <var>itemName</var></li>
-                        <li>Integer <var>itemCost</var></li>
-                        <li>Integer <var>damage</var></li>
-                        <li> Integer <var>health</var></li>
-                        <li>Integer <var>maxHealth</var></li>
-                        <li>Integer <var>mana</var></li>
-                        <li> Integer <var>maxMana</var></li>
-                        <li>Integer <var>moveSpeed</var></li>
-                        <li>Integer <var>manaRegeneration</var></li>
-                        <li> Integer <var>isPotion</var> [it’s a potion if it’s equal to 1]</li>
-                    </ul>
                 </div>
             </div>
 
             <!-- Protocol block -->
             <div class="blk">
-                <div class="title">Input for one game turn</div>
+                <div class="title">Input for all game turn</div>
                 <div class="text">
-                    <span class="statement-lineno">Line 1:</span> your <var>playerId</var> as Integer<br>
-                    <span class="statement-lineno">Line 2:</span>  <var>number of Ships</var> as Integer<br>
-                    <span class="statement-lineno">Line 3:</span> <var>roundType</var> an Integer that lets you know if you’re in the Hero pick phase or during the actual game phase.<br>
-                    <span class="statement-lineno">Line 4:</span> <var>entityCount</var> a number that represents the sum of all heroes, units, towers and neutral creatures currently on the map<br>
+                    <span class="statement-lineno">Line 1:</span>  <var>shipsNumber</var> as Integer<br>
                     <br>
-
-                    <span class="statement-lineno">Next <var>entityCount</var> inputs of:</span>
+                    <span class="statement-lineno">Next <var>shipsNumber</var> lines : </span>ships data. Integers separated by space
                     <ul>
-                        <li>Integer <var>unitId</var></li>
-                        <li>Integer <var>team</var></li>
-                        <li>String <var>unitType</var></li>
-                        <li> Integer <var>x</var></li>
-                        <li>Integer <var>y</var></li>
-                        <li>Integer <var>attackRange</var></li>
-                        <li> Integer <var>health</var></li>
-                        <li>Integer <var>max_health</var></li>
-                        <li>Integer <var>shield</var></li>
-                        <li>Integer <var>attack_damage</var></li>
-                        <li> Integer <var>movement_speed</var></li>
-                        <li>Integer <var>stun_duration</var></li>
-                        <li> Integer <var>gold_value</var></li>
+                        <li>  <var>id</var></li>
+                        <li>  <var>owner</var> : team number of the owner</li>
+                        <li>  <var>x</var></li>
+                        <li>   <var>y</var></li>
+                        <li>  <var>vx</var></li>
+                        <li>  <var>vy</var></li>
+                        <li>   <var>health</var></li>
                     </ul>
-                    <br><br>If the <var>unitType</var> is a <action>HERO</action> it will also have:<br>
+                    <br> 
+                    <span class="statement-lineno">Line <var>shipsNumber</var>+2  </span><var>bombsNumber</var> as Integer<br>
+                     <br>
+                    <span class="statement-lineno">Next <var>bombsNumber</var> lines : </span>bombs data. Integers separated by space
                     <ul>
-                        <li> Integers <var>countDown1</var>, <var>countDown2</var> and <var>countDown3</var> representing the countdown on each skill before next skill usage is possible</li>
-                        <li>Integer <var>mana</var></li>
-                        <li>Integer <var>maxMana</var></li>
-                        <li> Integer <var>manaRegeneration</var></li>
-                        <li>String <var>heroType</var></li>
-                        <li>Integer <var>isVisible</var> [1 if visible]</li>
-                        <li> Integer <var>itemsOwned</var></li>
+                        <li>  <var>id</var></li>
+                        <li>  <var>x</var></li>
+                        <li>  <var>y</var></li>
+                        <li>  <var>vx</var></li>
+                        <li>   <var>vy</var></li>
+                        <li>  <var>tic</var> : countdown. Explosion at 0 during beginning of turn.</li>
                     </ul>
                 </div>
             </div>
@@ -310,24 +241,30 @@ Groot
             <!-- Protocol block -->
             <div class="blk">
                 <div class="title">Output for one game turn</div>
-                <div class="text">Depending on the value of <var>roundType</var> your output must be either a hero pick or a hero command.
+                <div class="text">Two moves at once : move command and action command are expected.Camment can be added at the end. All are comma seperated.
                     <br><br>
-                    If <var>roundType</var> is negative you must select a hero:
-                    </br><br>
-                    <strong>One Output line:</strong> <var>heroName</var> must be one of the available heroes <action>DEADPOOL</action>, <action>DOCTOR_STRANGE</action>, <action>HULK</action>, <action>IRONMAN</action>, <action>VALKYRIE</action>
-                    <br></br>
-                    If <var>roundType</var> is positive, it means you own <var>roundType</var> heroes and you must output:
-                    <br></br>
-                    <strong>One line for each living hero you own, containing any of the following actions:</strong>
-                    </br>
+                    <strong>Move command</strong>
+                    <br>
                     <ul>
                         <li><action>WAIT</action></li>
                         <li><action>MOVE x y</action></li>
-                        <li><action>ATTACK unitId</action></li>
-                        <li><action>ATTACK_NEAREST unitType</action> [UNIT, HERO, TOWER, GROOT]</li>
-                        <li><action>MORE_ATTACK TEST x y unitId</action></li>
                     </ul>
-
+                    
+                    <strong>Action command</strong>
+                    </br>
+                    <ul>
+                        <li><action>HEAL</action></li>
+                        <li><action>SHOOT x y</action></li>
+                    </ul>
+                    
+                    </div>
+                    </br>
+                    Possible output commands :
+                    <br>WAIT;
+                   <br> MOVE X Y; SHOOT X Y;
+                    <br>MOVE X Y; HEAL;
+                   <br> MOVE X Y;HEAL; I Heal my friend
+                    <br><br>
                 </div>
             </div>
 
@@ -335,7 +272,7 @@ Groot
             <div class="blk">
                 <div class="title">Constraints</div>
                 <div class="text">
-                    Response time for first turn ≤ 200ms <br>
+                    Response time for first turn ≤ 300ms <br>
                     Response time for one turn ≤ 50ms</div>
             </div>
         </div>
@@ -351,21 +288,21 @@ Groot
             <div class="statement-story" style="min-height: 300px; position: relative">
                 <h2><font color="#fff">Space shooters </font></h2>
                 <div class="story-text"><font color="#fff">
-                
+                <br>
                   <p>Hey trolls are trolling everywhere, arent they?</p>
-                  
+                  <br>
                   <p>So you find yourself hunting trolls in space. But for that juicy price, concurrency was to be expected. This is asking for trouble. This is no rules place.</p>
-
+<br>
                   <p>What a foolish quest. This ends up being a total fiasco and soon enough trolls are taking advantage of your sloppiness. </p>
 
 				  <p>What do you do when you find this troll chase turns out to be a troll itself ?</p>
-				  
+				  <br>
 				  <p>Do not give up easy.</p>
-				  
+				  <br>
 				  <p>Explore the nightmare to come..</p>
-				  
+				  <br>
 				  <p>Gotta end this mess...</p>
-                  
+                  <br>
                 </font></div>
             </div></div>
     </div>
