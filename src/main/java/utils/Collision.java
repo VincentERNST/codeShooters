@@ -1,6 +1,6 @@
 package utils;
 
-import pojo.Bullet;
+import pojo.Bomb;
 import pojo.Shooter;
 import pojo.Unit;
 import pojo.Wall;
@@ -31,26 +31,26 @@ public class Collision{
 			return;
 		}
 		
-		if(u1 instanceof Bullet){//ball hits a unit
-			((Bullet)u1).explosion();
+		if(u1 instanceof Bomb){//ball hits a unit
+			((Bomb)u1).explosion();
 			if(u2 instanceof Shooter) {
-				((Shooter) u2).hp-=Constants.BULLET_DAMAGE;
+				((Shooter) u2).hp-=Constants.BOMB_DAMAGE;
 				((Shooter) u2).s.setImage("damaged.png");
 			}
-			else if(u2 instanceof Bullet){
-				((Bullet)u2).explosion();
+			else if(u2 instanceof Bomb){
+				((Bomb)u2).explosion();
 			}
 			return;
 		}
 		
-		if(u2 instanceof Bullet){//a unit hits a ball
-			((Bullet)u2).explosion();
+		if(u2 instanceof Bomb){//a unit hits a ball
+			((Bomb)u2).explosion();
 			if(u1 instanceof Shooter) {
-				((Shooter) u1).hp-=Constants.BULLET_DAMAGE;
+				((Shooter) u1).hp-=Constants.BOMB_DAMAGE;
 				((Shooter) u1).s.setImage("Damaged.png");
 			}
-			else if(u1 instanceof Bullet){
-				((Bullet)u1).explosion();
+			else if(u1 instanceof Bomb){
+				((Bomb)u1).explosion();
 			}
 			return;
 		}

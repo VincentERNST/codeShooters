@@ -21,7 +21,7 @@ public class Shooter extends Unit{
 	public Shooter(int id, int owner, int x, int y, int vx, int vy) {
 		super(id,x,y,vx,vy,Constants.PLAYER_RADIUS,Constants.PLAYER_AMORT);
 		this.owner=owner;
-		hp=Constants.PLAYER_HP;
+		hp=Constants.BASE_PLAYER_HP;
 	}
 	
 	@Override
@@ -55,6 +55,7 @@ public class Shooter extends Unit{
 
 	public void heal() {
 		hp+=Constants.HEAL;
+		hp= Math.min(hp,Constants.BASE_PLAYER_HP);
 		s.setImage("healed.png");
 	}
 

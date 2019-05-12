@@ -1,0 +1,309 @@
+<div id="statement_back" class="statement_back" style="display:none"></div>
+
+        <div class="statement-body">
+
+
+        <!-- LEAGUE ALERT -->
+        <div style="color: #7cc576;
+        background-color: rgba(124, 197, 118,.1);
+        padding: 20px;
+        margin-right: 15px;
+        margin-left: 15px;
+        margin-bottom: 10px;
+        text-align: left;">
+            <div style="text-align: center; margin-bottom: 6px">
+                <img src="//cdn.codingame.com/smash-the-code/statement/league_wood_04.png" />
+            </div>
+
+
+
+            <!-- BEGIN bronze -->
+            <p style="text-align: center; font-weight: 700; margin-bottom: 6px;">
+                Summary of new rules
+            </p>
+            <span class="statement-league-alert-content">
+	          Starting from the bronze league <const>Vortex</const> comes into the fray<br />
+				This is the last rule change.<br />
+				See the updated statement for details.
+	      </span>
+            <!-- END -->
+        </div>
+
+
+        <!-- GOAL -->
+        <div class="statement-section statement-goal">
+            <h1>
+                <span class="icon icon-goal">&nbsp;</span>
+                <span>The Goal</span>
+            </h1>
+            <div class="statement-goal-content">
+                <!-- LEAGUES wood3 wood2 wood1 bronze -->
+                Destroy your opponent's ships or end up with more total HP.
+            </div>
+        </div>
+
+
+        <!-- RULES -->
+        <div class="statement-section statement-rules">
+            <h1>
+                <span class="icon icon-rules">&nbsp;</span>
+                <span>Rules</span>
+            </h1>
+            <div><div class="statement-rules-content">
+
+                <p>The game is played on a map <const>1920 </const>units wide and <const>1080</const> units high with 2 players.<br>
+                    The coordinate <const>X=0</const>,<const> Y=0</const> is the top left pixel.</p>
+
+                <!-- BEGIN wood3 wood2 -->
+                <p>Each player controls <const>2</const> Ships with <const>100</const>HP.</p>
+                <p>During a turn, each Ship is supposed to move and either apply a shoot or a repair.</p>
+                <!-- END -->
+                
+                <p>The Bombs have a <const>6</const> turns timer. They hit for <const>10</const> damage on direct collision, and  <const>2</const> on area of effect damage.</p>
+                <p>The Repair heals for <const>5</const> HP. It applies on ally Ship.</p>
+
+ 				<!-- BEGIN  bronze-->
+                <p>The Vortex drags every units to center every beginning of turn. The closer to center unit is, the stronger vortex pull is.</p>
+                <!-- END -->
+
+                <br>
+                <p><strong>The Ships</strong><br>
+                    <br>
+                    Ships have a discs of radius <const>50</const>. They start at <const>100</const>HP. They move with a <const>200</const> thrust.<br> Ships can do actions : <br>
+                    <ul>
+                <li><action>WAIT</action> <br></li>
+                    <li><action>SHOOT x y</action>: Throw a Bomb from Ship position towards x y<br></li>
+                    <li><action>HEAL</action>: repair ally Ship for <const>5</const>HP<br></p></li>
+                    </ul>
+					<br>
+					
+                <p><strong>The Bombs</strong><br>
+                    <br>
+                    Bombs act like bombs starting with <const>6</const> timer
+                    Bombs explode at end of timer or at collision with an other entity, dealing <const>10</const> direct damage to Ships and <const>2</const> additional area of effect damage at the end of turn.
+					<br>				
+
+                   <p><strong>The Vortex</strong><br>
+                    <br>Vortex is roughly placed at center of map (960; 540). It has <const>200</const> radius.
+                    It applies a dragging force at end of turn.
+                    Any entity that goes across the vortex radius is swallowed and removed from the game  
+                    					<br>				
+
+                <!-- Victory conditions -->
+                <div class="statement-victory-conditions">
+                    <div class="icon victory"></div>
+                    <div class="blk">
+                        <div class="title">Victory Conditions</div>
+                        <div class="text">
+                            <ul>
+                                <li>Destroy the enemy set of ships</li>
+                                <!-- BEGIN wood3 wood2 -->
+                                <li>Kill both enemy heroes</li>
+                                <!-- END -->
+
+                                <!-- BEGIN wood2 wood1 bronze -->
+                                <li>Have more total HP(tie break)</li>
+                                <!-- END -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lose conditions -->
+                <div class="statement-lose-conditions">
+                    <div class="icon lose"></div>
+                    <div class="blk">
+                        <div class="title">Lose Conditions</div>
+                        <div class="text">
+                            <ul>
+                                <li>Lose all ship</li>
+                                <li>Output wrong command</li>
+                                <li>Have less total HP(tie break)</li>
+                            </ul>                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<br>
+
+        <!-- EXPERT RULES -->
+        <div class="statement-section statement-expertrules">
+            <h1>
+                <span class="icon icon-expertrules">&nbsp;</span>
+                <span>Expert Rules</span>
+            </h1>
+            <div class="statement-expert-rules-content">
+                <br>
+
+                <p><strong>Collisions</strong><br>
+                    <br>
+					All collisions are elastic. For technical reasons, a minimal impulse of 100 is applied to colliding entities if their speed is too low (doesn't apply when colliding with map edges).</p><br>
+					<br>
+					When a Bomb collides with an other Bomb, speed reset to <const>0</const>, it explodes. 
+					When a Bomb collides with a Ship, Bomb speed reset to <const>0</const>, it explodes, Ship loses HP. Ship speed is not affected. 
+					</p>
+<br><br>
+                <p><strong>Moves</strong><br>
+                    <br>Thrust adds to speed vector before each moves.
+					<br>Frictions applies at end of turn on speed vector : v = f*v.
+					<br>Rounding : positions and speed vectors are rounded at end of turn : v=(int)Math.round(v)</p>
+<br><br>
+
+                <p><strong>Ship</strong><br>
+                    <br>
+
+                   Ships characteristics are as follow :
+				   <br>Thrust : <const>80</const>
+                   <br>Friction : <const>0.7</const>
+                   <br>Radius : <const>50</const>
+                   <br>Base HP : <const>100</const>
+                   </p>
+<br><br>
+
+                <p><strong>Bomb</strong><br>
+                    <br>
+                    
+                   Bombs characteristics are as follow :
+                   <br>Friction : <const>0.8</const>
+                   <br>Radius: <const>50</const>
+                   <br>Explosion radius : <const>150</const>
+                   <br>Impact Damage: <const>10</const>
+                   <br>Area of effect damage : <const>10</const>
+                   <br>Bombs aquire the speed of their luncher, plus shooter thrust. Whenever Bombs explode, their speed is set to zero.
+                   </p>
+<br><br>
+
+                <p><strong>Vortex</strong><br>
+                   <br>
+                   Vortex has <const>200</const> radius
+                   <br>Given d2 square distance between Vortex and entity,
+                   <br> Vortex applies a thurst <strong>attractionForce = Math.max( 300/(d2/20000) , 10.0 )</strong>. 
+                   <br>It is going from entity to Vortex center.
+                   <br>When entity collides with Vortex (edge to edge). It is trashed into Vortex center. 
+                   
+</p>
+
+
+</div>
+
+
+
+                    </p><br>
+
+
+
+         <!-- PROTOCOL -->
+        <div class="statement-section statement-protocol">
+            <h1>
+                <span class="icon icon-protocol">&nbsp;</span>
+                <span>Game Input</span>
+            </h1>
+            <!-- Protocol block -->
+            <div class="blk">
+                <div class="title">Initialization input</div>
+                <div class="text"><span class="statement-lineno">Line 1:</span> your <var>team</var>’s number, can be either 0 or 1.<br>
+                </div>
+            </div>
+
+            <!-- Protocol block -->
+            <div class="blk">
+                <div class="title">Input for all game turn</div>
+                <div class="text">
+                    <span class="statement-lineno">Line 1:</span>  <var>shipsNumber</var> as Integer<br>
+                    <br>
+                    <span class="statement-lineno">Next <var>shipsNumber</var> lines : </span>ships data. Integers separated by space
+                    <ul>
+                        <li>  <var>id</var></li>
+                        <li>  <var>owner</var> : team number of the owner</li>
+                        <li>  <var>x</var></li>
+                        <li>   <var>y</var></li>
+                        <li>  <var>vx</var></li>
+                        <li>  <var>vy</var></li>
+                        <li>   <var>health</var></li>
+                    </ul>
+                    <br> 
+                    <span class="statement-lineno">Line <var>shipsNumber</var>+2  </span><var>bombsNumber</var> as Integer<br>
+                     <br>
+                    <span class="statement-lineno">Next <var>bombsNumber</var> lines : </span>bombs data. Integers separated by space
+                    <ul>
+                        <li>  <var>id</var></li>
+                        <li>  <var>x</var></li>
+                        <li>  <var>y</var></li>
+                        <li>  <var>vx</var></li>
+                        <li>   <var>vy</var></li>
+                        <li>  <var>tic</var> : countdown. Explosion at 0 during beginning of turn.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Protocol block -->
+            <div class="blk">
+                <div class="title">Output for one game turn</div>
+                <div class="text">Two moves at once : move command and action command are expected.Camment can be added at the end. All are comma seperated.
+                    <br><br>
+                    <strong>Move command</strong>
+                    <br>
+                    <ul>
+                        <li><action>WAIT</action></li>
+                        <li><action>MOVE x y</action></li>
+                    </ul>
+                    
+                    <strong>Action command</strong>
+                    </br>
+                    <ul>
+                        <li><action>HEAL</action></li>
+                        <li><action>SHOOT x y</action></li>
+                    </ul>
+                    
+                    </div>
+                    </br>
+                    Possible output commands :
+                    <br>WAIT;
+                   <br> MOVE X Y; SHOOT X Y;
+                    <br>MOVE X Y; HEAL;
+                   <br> MOVE X Y;HEAL; I Heal my friend
+                    <br><br>
+                </div>
+            </div>
+
+            <!-- Protocol block -->
+            <div class="blk">
+                <div class="title">Constraints</div>
+                <div class="text">
+                    Response time for first turn ≤ 300ms <br>
+                    Response time for one turn ≤ 50ms</div>
+            </div>
+        </div>
+
+
+
+
+
+
+    <!-- STORY -->
+    <div class="statement-story-background">
+        <div class="statement-story-cover" style="background-size: cover; background-image: url(https://www.nasa.gov/sites/default/files/thumbnails/image/m87-full_jpg.jpg)">
+            <div class="statement-story" style="min-height: 300px; position: relative">
+                <h2><font color="#fff">Space shooters </font></h2>
+                <div class="story-text"><font color="#fff">
+                <br>
+                  <p>Hey trolls are trolling everywhere, arent they?</p>
+                  <br>
+                  <p>So you find yourself hunting trolls in space. But for that juicy price, concurrency was to be expected. This is asking for trouble. This is no rules place.</p>
+<br>
+                  <p>What a foolish quest. This ends up being a total fiasco and soon enough trolls are taking advantage of your sloppiness. </p>
+
+				  <p>What do you do when you find this troll chase turns out to be a troll itself ?</p>
+				  <br>
+				  <p>Do not give up easy.</p>
+				  <br>
+				  <p>Explore the nightmare to come..</p>
+				  <br>
+				  <p>Gotta end this mess...</p>
+                  <br>
+                </font></div>
+            </div></div>
+    </div>
+</div>

@@ -13,7 +13,7 @@ import com.codingame.gameengine.module.entities.GraphicEntityModule;
 import com.codingame.gameengine.module.entities.Sprite;
 import com.codingame.gameengine.module.entities.Text;
 import com.google.inject.Inject;
-import pojo.Bullet;
+import pojo.Bomb;
 import pojo.Point;
 import pojo.Shooter;
 import pojo.Unit;
@@ -28,7 +28,7 @@ public class Referee extends AbstractReferee {
 	
     @Inject private GameManager<Player> gameManager;
     @Inject private GraphicEntityModule graphicEntityModule;
-    private List<Bullet> bullets = new ArrayList<Bullet>();
+    private List<Bomb> bombs = new ArrayList<Bomb>();
     private Shooter[] shooters = new Shooter[Constants.NUMBER_OF_PLAYERS * Constants.NUMBER_OF_SHIPS];
     private TooltipModule tooltipModule;
     private static Text hp11;
@@ -64,7 +64,7 @@ public class Referee extends AbstractReferee {
         //compute turn
     	List<Unit> units = new ArrayList<Unit>();
     	units.addAll(Arrays.asList(shooters));
-    	units.addAll(bullets);
+    	units.addAll(bombs);
     	
 	    ticBullets();
 		vortex.attract(units);
@@ -85,14 +85,14 @@ public class Referee extends AbstractReferee {
 
 	private void computeDeaths() {
     	
-		for (int i=bullets.size()-1; i>=0 ; i--){
-			Bullet b = bullets.get(i);
+		for (int i=bombs.size()-1; i>=0 ; i--){
+			Bomb b = bombs.get(i);
 			if(b.tic==-1) {
 				b.fade();
 			}
 			if(b.tic==-2) {
 				b.s.setVisible(false);
-				bullets.remove(b);
+				bombs.remove(b);
 			}
 		}
 		
@@ -112,10 +112,10 @@ public class Referee extends AbstractReferee {
 			if(!p.isAlive())
 				continue;
 			boolean getHit = false;
-			for(Bullet b : bullets) {
+			for(Bomb b : bombs) {
     			if(b.tic==0 && Utils.distance(b, p)<Constants.EXPLOSION_RADIUS+Constants.PLAYER_RADIUS){
-    				p.hp-=Constants.BULLET_AOE_DAMAGE;
-    				p.s.setImage("Damaged.png");
+    				p.hp-=Constants.BOMB_AOE_DAMAGE;
+    				p.s.setImage("DamagedByAOE.png");
     				getHit = true;
     			}
     		}
@@ -125,13 +125,13 @@ public class Referee extends AbstractReferee {
     	}
 		
 		//chain reactions
-		for(Bullet b1 : bullets) {
+		for(Bomb b1 : bombs) {
 			if(b1.tic!=0)
 				continue;
-			for(Bullet b2 : bullets) {
+			for(Bomb b2 : bombs) {
 				if(!b2.isAlive())
 					continue;
-				if(b1.tic==0 && Utils.distance(b1, b2)<Constants.EXPLOSION_RADIUS+Constants.BULLET_RADIUS){
+				if(b1.tic==0 && Utils.distance(b1, b2)<Constants.EXPLOSION_RADIUS+Constants.BOMB_RADIUS){
 					b2.tic=1;
 				}
 			}
@@ -144,8 +144,8 @@ public class Referee extends AbstractReferee {
     
 	private void ticBullets() {
 
-		for (int i=bullets.size()-1; i>=0 ; i--){
-			Bullet b = bullets.get(i);
+		for (int i=bombs.size()-1; i>=0 ; i--){
+			Bomb b = bombs.get(i);
 			b.tic--;
 			if(b.tic==0){
 				b.explosion();
@@ -231,9 +231,9 @@ public class Referee extends AbstractReferee {
 	        for( Shooter shooter: shooters){
 	        	player.sendInputLine(String.format("%d %d %d %d %d %d %d",shooter.id, shooter.owner, (int)shooter.x, (int)shooter.y, (int)shooter.vx, (int)shooter.vy, shooter.hp));
 	        }
-	        //send bullets inputs
-	        player.sendInputLine(String.format("%d", bullets.size()));
-	        for(Bullet b : bullets){
+	        //send bombs inputs
+	        player.sendInputLine(String.format("%d", bombs.size()));
+	        for(Bomb b : bombs){
 	        	player.sendInputLine(String.format("%d %d %d %d %d %d",b.id, (int)b.x, (int)b.y, (int)b.vx, (int)b.vy, b.tic));
 	        }
     	}
@@ -271,13 +271,17 @@ public class Referee extends AbstractReferee {
 					if (shoot.split(" ")[0].equals("SHOOT")) {
 						int targetShootX = Integer.parseInt(shoot.split(" ")[1]);
 						int targetShootY = Integer.parseInt(shoot.split(" ")[2]);
-						gameManager.addToGameSummary(String.format("Player %s played shoot (%d %d) ", player.getNicknameToken(), targetShootX, targetShootY));
-						
-			            Bullet b = UnitFactory.createBullet((int)unit.x, (int)unit.y,unit.vx,unit.vy);
-			            Point target = new Point(targetShootX , targetShootY);
-			            Utils.aim(b, new Point(targetShootX , targetShootY),Constants.BULLET_THRUST);
-			            bullets.add(b);
-			            draw(b,target);
+						if( targetShootX == unit.x && targetShootY == unit.y) {
+							gameManager.addToGameSummary(String.format("%s tried to shoot himself. Shoot is canceled.", player.getNicknameToken()));
+						}
+						else {
+				            Bomb b = UnitFactory.createBomb((int)unit.x, (int)unit.y,unit.vx,unit.vy);
+				            Point target = new Point(targetShootX , targetShootY);
+				            Utils.aim(b, new Point(targetShootX , targetShootY),Constants.BOMB_THRUST);
+				            bombs.add(b);
+				            draw(b,target);
+				            gameManager.addToGameSummary(String.format("Player %s played shoot (%d %d) ", player.getNicknameToken(), targetShootX, targetShootY));
+						}
 					}
 					else if (shoot.split(" ")[0].equals("HEAL")) {
 						if(!friend.isAlive()){
@@ -294,7 +298,11 @@ public class Referee extends AbstractReferee {
 					
 					//comment 
 					if(output.length>2) {
-						shooters[player.getIndex()+2*i].message.setText(output[2]);
+						String msg = output[2];
+						if( msg.length()>15) {
+							msg = msg.substring(0,13)+"...";
+						}
+						shooters[player.getIndex()+2*i].message.setText(msg);
 					}
 	            }
 		       } catch (NumberFormatException e) {
@@ -407,12 +415,12 @@ public class Referee extends AbstractReferee {
 //		graphicEntityModule.commitEntityState(t, p.message);//dont let comment go out of map
 		graphicEntityModule.commitEntityState(t, p.circle);
 		
-		p.dynamicHealthBar.setScaleX(Math.min(1.0,Math.max(0,(double)Math.max(0,p.hp)/Constants.PLAYER_HP)) +t*Constants.EPSILON);//t factor allows to bypass unexpected interpolation
+		p.dynamicHealthBar.setScaleX(Math.min(1.0,Math.max(0,(double)Math.max(0,p.hp)/Constants.BASE_PLAYER_HP)) +t*Constants.EPSILON);//t factor allows to bypass unexpected interpolation
 		graphicEntityModule.commitEntityState(t, p.dynamicHealthBar);
 	}
     
 	
-	private void draw(Bullet b, Point target) {
+	private void draw(Bomb b, Point target) {
 		if(b.s==null) {
 	        b.s=graphicEntityModule.createSprite();
 		}
@@ -475,11 +483,11 @@ public class Referee extends AbstractReferee {
         	    shooters[player.getIndex()+2*i] = UnitFactory.createShooter(player.getIndex(), Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4,  Constants.HEIGHT/4*(4*i*player.getIndex()+3-2*i-2*player.getIndex()),  0,0);
  
 	            //create hp bars
-        	    shooters[player.getIndex()+2*i].staticHealthBar = graphicEntityModule.createRectangle().setFillColor(0xE41515).setWidth(Constants.PLAYER_HP).setHeight(8)
-	            		.setY(110+i*50).setX(100 +(int)Constants.PLAYER_RADIUS + (player.getIndex() % 2) * Constants.WIDTH -Constants.PLAYER_HP*(player.getIndex() % 2)  - 200* (player.getIndex() % 2)-2*(player.getIndex() % 2)*((int)Constants.PLAYER_RADIUS) )
+        	    shooters[player.getIndex()+2*i].staticHealthBar = graphicEntityModule.createRectangle().setFillColor(0xE41515).setWidth(Constants.BASE_PLAYER_HP).setHeight(8)
+	            		.setY(110+i*50).setX(100 +(int)Constants.PLAYER_RADIUS + (player.getIndex() % 2) * Constants.WIDTH -Constants.BASE_PLAYER_HP*(player.getIndex() % 2)  - 200* (player.getIndex() % 2)-2*(player.getIndex() % 2)*((int)Constants.PLAYER_RADIUS) )
 	            		.setZIndex(100);
-        	    shooters[player.getIndex()+2*i].dynamicHealthBar = graphicEntityModule.createRectangle().setFillColor(0x00FF00).setWidth(Constants.PLAYER_HP).setHeight(8)
-	            		.setY(110+i*50).setX(100 +(int)Constants.PLAYER_RADIUS + (player.getIndex() % 2) * Constants.WIDTH -Constants.PLAYER_HP*(player.getIndex() % 2)  - 200* (player.getIndex() % 2)-2*(player.getIndex() % 2)*((int)Constants.PLAYER_RADIUS) )
+        	    shooters[player.getIndex()+2*i].dynamicHealthBar = graphicEntityModule.createRectangle().setFillColor(0x00FF00).setWidth(Constants.BASE_PLAYER_HP).setHeight(8)
+	            		.setY(110+i*50).setX(100 +(int)Constants.PLAYER_RADIUS + (player.getIndex() % 2) * Constants.WIDTH -Constants.BASE_PLAYER_HP*(player.getIndex() % 2)  - 200* (player.getIndex() % 2)-2*(player.getIndex() % 2)*((int)Constants.PLAYER_RADIUS) )
 	            		.setZIndex(100);
 	            
 	            //create ship sprite
