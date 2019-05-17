@@ -36,7 +36,7 @@ public class Referee extends AbstractReferee {
     private static Text hp21;
     private static Text hp22;
     private static Sprite backGround;
-    private static Vortex vortex= new Vortex(-1, Constants.WIDTH/2, Constants.HEIGHT/2,200.0);
+    public static Vortex vortex= new Vortex(-11, Constants.WIDTH/2, Constants.HEIGHT/2,Constants.VORTEX_RADIUS);
     
     @Override
     public Properties init(Properties params) {
@@ -192,9 +192,6 @@ public class Referee extends AbstractReferee {
 
 	private void moveAll(List<Unit> units,  double from, double duration) {
 		for(Unit unit : units) {
-			if(!unit.isAlive())
-				continue;
-			
 			unit.move(duration);
 			if( unit instanceof Shooter) {
 				updateSprites((Shooter)unit,from+duration);
@@ -441,7 +438,7 @@ public class Referee extends AbstractReferee {
   			    .setImage("vortex.png")
   				.setX(Constants.WIDTH/2)
   				.setY(Constants.HEIGHT/2)
-  				.setScale(2)
+  				.setScale(2*Constants.VORTEX_RADIUS/100)
   				.setAnchor(0.5)
   				.setZIndex(1);
   	  
@@ -535,6 +532,7 @@ public class Referee extends AbstractReferee {
               .setFontSize(30)
               .setFillColor(gameManager.getPlayers().get(0).getColorToken())
               .setAnchor(0);
+      
       hp12 = graphicEntityModule.createText("100")
       		.setX(165 +2*(int)Constants.PLAYER_RADIUS )
       		.setY(150)
@@ -548,6 +546,7 @@ public class Referee extends AbstractReferee {
               .setFontSize(30)
               .setFillColor(gameManager.getPlayers().get(1).getColorToken())
               .setAnchor(0);
+      
       hp22 = graphicEntityModule.createText("100")
               	.setX(Constants.WIDTH - 220 - 2*(int)Constants.PLAYER_RADIUS)
               	.setY(150)

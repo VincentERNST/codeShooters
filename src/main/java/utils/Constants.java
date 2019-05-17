@@ -29,6 +29,7 @@ public final class Constants {
 	public static int BOMB_AOE_DAMAGE = 2;
 	
 	public static final double VORTEX_THRUST = 300.;
+	public static final double VORTEX_RADIUS = 100.;
 	
 	public static int FIRST_TURN = 200;
 	

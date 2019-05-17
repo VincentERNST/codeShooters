@@ -58,4 +58,14 @@ public class Bomb extends Unit{
         tooltipModule.updateExtraTooltipText(s, sb.toString());
 	}
 	
+	@Override
+	public void fallIntoVortex() {
+		x=Constants.center.x;
+		y=Constants.center.y;
+		vx=0;
+		vy=0;
+		s.setScale(0.);
+		tic=-2;
+	}
+	
 }

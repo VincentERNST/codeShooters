@@ -59,5 +59,16 @@ public class Shooter extends Unit{
 		s.setImage("healed.png");
 	}
 
+	@Override
+	public void fallIntoVortex() {
+		x=Constants.center.x;
+		y=Constants.center.y;
+		vx=0;
+		vy=0;
+		s.setScale(0.);
+		circle.setVisible(false);
+		hp=0;
+	}
+	
 	
 }
