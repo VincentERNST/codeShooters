@@ -441,6 +441,15 @@ public class Referee extends AbstractReferee {
   				.setScale(2*Constants.VORTEX_RADIUS/100)
   				.setAnchor(0.5)
   				.setZIndex(1);
+  	  //vortex center
+	  	graphicEntityModule.createSprite()
+		    .setImage("BlackHoleBlue.png")
+			.setX(Constants.WIDTH/2)
+			.setY(Constants.HEIGHT/2)
+			.setScale(2*Constants.VORTEX_RADIUS/300)
+			.setAnchor(0.5)
+			.setZIndex(1);
+  	  
   	  
   	  for (Player player : gameManager.getPlayers()) {
     	  //send player id

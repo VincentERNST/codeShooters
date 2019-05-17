@@ -66,7 +66,7 @@ public class Shooter extends Unit{
 		vx=0;
 		vy=0;
 		s.setScale(0.);
-		circle.setVisible(false);
+		circle.setScale(0.);
 		hp=0;
 	}
 	
