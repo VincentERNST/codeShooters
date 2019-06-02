@@ -3,6 +3,7 @@ package utils;
 import pojo.Bomb;
 import pojo.Shooter;
 import pojo.Unit;
+import pojo.Vortex;
 import pojo.Wall;
 
 public class Collision{
@@ -19,6 +20,15 @@ public class Collision{
 	}
 	
 	public void apply() {
+		
+		if(u1 instanceof Vortex){//unit caught by the Vortex
+			u2.fallIntoVortex();
+			return;
+		}
+		if(u2 instanceof Vortex){//unit caught by the Vortex
+			u1.fallIntoVortex();
+			return;
+		}
 		
 		if(u2 instanceof Wall){//unit hits a wall
 			Wall wall = (Wall)u2;

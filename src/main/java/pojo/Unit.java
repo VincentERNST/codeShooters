@@ -50,6 +50,10 @@ public class Unit extends Point{
 	public boolean isAlive() {
 		return false;
 	}
+
+	public void fallIntoVortex() {
+		
+	}
 	
     
 }
