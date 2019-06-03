@@ -16,7 +16,7 @@ public final class Constants {
 	
 	public static int BASE_PLAYER_HP = 100;
 	public static double PLAYER_AMORT = 0.7;
-	public static final double PLAYER_THRUST = 80.;
+	public static final double PLAYER_THRUST = 60.;
 	public static double PLAYER_RADIUS = 50.0;//60
 	
 	
@@ -25,7 +25,7 @@ public final class Constants {
 	public static double BOMB_AMORT = 0.8;
 	public static int BOMB_DAMAGE = 10;
 	public static double EXPLOSION_RADIUS = 150.0;
-	public static double BOMB_THRUST = 200.0;
+	public static double BOMB_THRUST = 150.0;
 	public static int BOMB_AOE_DAMAGE = 2;
 	
 	public static final double VORTEX_THRUST = 300.;
