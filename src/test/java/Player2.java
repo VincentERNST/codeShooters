@@ -53,12 +53,18 @@ public class Player2 {
             	balls.add(b);
             }
         	
+            
+            System.err.println("i have "+ships.size());
+            
+            
+            
             for(Ship s : ships){
-            	
 
-            	if( s.hp<=0){
-            		System.out.println("WAIT");continue;
+            	if(s.hp<=0){
+            		System.out.println("WAIT");
+            		continue;
             	}
+            	
             	Ball b = closestComingBall(s);
             	int aimX = (int) s.x;
             	int aimY=(int) s.y;
@@ -67,18 +73,25 @@ public class Player2 {
             		aimX = (int)(s.x + 1000*Math.cos(a+(0.6*Math.PI)) ); 
             		aimY = (int)(s.y + 1000*Math.sin(a+(0.6*Math.PI)) ); 
             	}
-            	Ship e = closestEnemyAlive(s);
             	
-            	if(turn%5==4){
-            		System.out.println(String.format("MOVE %d %d;HEAL;HEAL",aimX , aimY));
+            	Ship e = closestEnemyAlive(s);
+            	if(e==null){
+            		System.err.println("WAIT");
+            		System.out.println("WAIT");
             		continue;
             	}
-            	
-            	if(turn%5==3){
-            		System.out.println(String.format("MOVE %d %d;SHOOT %d %d; Shoot "+e.x+" "+e.y,aimX , aimY,(int)s.x ,(int)s.y));
-            		continue;
-            	}           	
-            	System.out.println(String.format("MOVE %d %d;SHOOT %d %d; Shoot "+e.x+" "+e.y,aimX , aimY,(int)e.x ,(int)e.y));
+            	else{
+	            	if(turn%5==4){
+	            		System.out.println(String.format("MOVE %d %d;HEAL;HEAL",aimX , aimY));
+	            		continue;
+	            	}
+	            	
+	            	if(turn%5==3){
+	            		System.out.println(String.format("MOVE %d %d;SHOOT %d %d; Shoot "+e.x+" "+e.y,aimX , aimY,(int)s.x ,(int)s.y));
+	            		continue;
+	            	}           	
+	            	System.out.println(String.format("MOVE %d %d;SHOOT %d %d; Shoot "+e.x+" "+e.y,aimX , aimY,(int)e.x ,(int)e.y));
+            	}
             }
              
              ships.clear();

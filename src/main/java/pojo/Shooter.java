@@ -13,10 +13,12 @@ public class Shooter extends Unit{
 	
 	public int owner;
 	public Text message;
+	public Text hpText;
 	public int hp;
 	public Circle circle;
 	public Rectangle staticHealthBar;
 	public Rectangle dynamicHealthBar;
+	public int invulTimer;
 	
 	public Shooter(int id, int owner, int x, int y, int vx, int vy) {
 		super(id,x,y,vx,vy,Constants.PLAYER_RADIUS,Constants.PLAYER_AMORT);

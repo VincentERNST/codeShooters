@@ -4,9 +4,10 @@ import pojo.Point;
 
 public final class Constants {
 	
-	public static final int GAME_TURN = 100;
+	public static final int MAX_GAME_TURN = 100;
 	public static int NUMBER_OF_PLAYERS = 2;
 	public static int NUMBER_OF_SHIPS = 2;
+	public static int INVUL_TIMER = 5;
 	public static int WIDTH = 1920;
 	public static int HEIGHT = 1080;
 	public static int HORIZONTAL = 0;

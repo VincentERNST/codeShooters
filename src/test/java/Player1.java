@@ -5,20 +5,12 @@ public class Player1 {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int myId = scanner.nextInt();
+        
         Random random = new Random();
         int turn = 0;
      whileloop :    while (true) {
         	turn ++;
-        	if(turn == 1){
-        		System.out.println("MOVE 774 61;SHOOT 1094 40;774 61");
-        		System.out.println("MOVE 774 61;SHOOT 1094 40;774 61");
-        		continue whileloop;
-        	}
-        	if(turn%5 == 3){
-        		System.out.println("MOVE 774 61;HEAL");
-        		System.out.println("MOVE 774 61;HEAL");
-        		continue whileloop;
-        	}
+
         	
             //players
             int m = scanner.nextInt();
@@ -51,9 +43,24 @@ public class Player1 {
              int  mx = random.nextInt(1920);
              int  my = random.nextInt(1080);
              
-
-            System.out.println(String.format("MOVE %d %d;SHOOT %d %d;"+mx+" "+my,mx ,my,x,y ));
-            System.out.println(String.format("MOVE %d %d;SHOOT %d %d;"+mx+" "+my,mx ,my,x,y ));
+             
+         	if(turn == 1){
+                for(int i=0;i<m;i++){
+                	System.out.println("MOVE 774 61;SHOOT 1094 40;774 61");
+                }
+        		continue whileloop;
+        	}
+        	if(turn%5 == 3){
+                for(int i=0;i<m;i++){
+                	System.out.println("MOVE 774 61;HEAL");
+                }
+        		continue whileloop;
+        	}
+        	
+        	
+            for(int i=0;i<m;i++){
+            	System.out.println(String.format("MOVE %d %d;SHOOT %d %d;"+mx+" "+my,mx ,my,x,y ));
+            }
         }
     }
 }

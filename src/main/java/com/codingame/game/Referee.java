@@ -2,8 +2,11 @@ package com.codingame.game;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
+
 import com.codingame.gameengine.core.AbstractPlayer.TimeoutException;
 import com.codingame.gameengine.core.AbstractReferee;
 import com.codingame.gameengine.core.GameManager;
@@ -29,12 +32,10 @@ public class Referee extends AbstractReferee {
     @Inject private GameManager<Player> gameManager;
     @Inject private GraphicEntityModule graphicEntityModule;
     private List<Bomb> bombs = new ArrayList<Bomb>();
-    private Shooter[] shooters = new Shooter[Constants.NUMBER_OF_PLAYERS * Constants.NUMBER_OF_SHIPS];
+//    private Shooter[] shooters = new Shooter[Constants.NUMBER_OF_PLAYERS * Constants.NUMBER_OF_SHIPS];
+    private ArrayList<Shooter> shooters = new ArrayList<Shooter>();
+    
     private TooltipModule tooltipModule;
-    private static Text hp11;
-    private static Text hp12;
-    private static Text hp21;
-    private static Text hp22;
     private static Sprite backGround;
     public static Vortex vortex= new Vortex(-11, Constants.WIDTH/2, Constants.HEIGHT/2,Constants.VORTEX_RADIUS);
     
@@ -56,6 +57,21 @@ public class Referee extends AbstractReferee {
 		moveBackGround(turn);
     	resetMessages();
 		
+    	System.err.println("turn "+turn);
+    	System.err.println(shooters.size()+"   ships ");
+    	
+    	if(turn%20==0 && turn >0){//adds
+    		int nbr = 2+(int)turn/30;//nbr is the count of ships for a team
+    		System.err.println("adds nbr  "+nbr);
+    	  	Shooter addShooterTeam0 = UnitFactory.createShooter(0,nbr);
+    	  	shooters.add(addShooterTeam0);
+    	  	drawShooter(addShooterTeam0,nbr);
+    	  	Shooter addShooterTeam1 = UnitFactory.createShooter(1,nbr);
+    	    shooters.add(addShooterTeam1);
+    	    drawShooter(addShooterTeam1,nbr);
+    	}
+    	
+    	
 		//send alyers inputs
     	sendInputs(turn);
     	//apply outputs
@@ -63,7 +79,7 @@ public class Referee extends AbstractReferee {
 	    
         //compute turn
     	List<Unit> units = new ArrayList<Unit>();
-    	units.addAll(Arrays.asList(shooters));
+    	units.addAll(shooters);
     	units.addAll(bombs);
     	
 	    ticBullets();
@@ -72,12 +88,13 @@ public class Referee extends AbstractReferee {
         computeTurn(units);
         computeAOE();
         computeDeaths();
+        updateHpCount();
         
         // check winner
         checkWinner(turn);
         
         //check tie
-        if(turn > Constants.GAME_TURN) {
+        if(turn > Constants.MAX_GAME_TURN) {
         	tieBreaker();
         }
         
@@ -223,8 +240,9 @@ public class Referee extends AbstractReferee {
 	
 	private void sendInputs(int turn) {
     	for(Player player : gameManager.getPlayers()) {
+    		player.setExpectedOutput(shooters.size()/2);
     		//send ships inputs
-    		player.sendInputLine(String.format("%d", Constants.NUMBER_OF_PLAYERS*Constants.NUMBER_OF_SHIPS));
+    		player.sendInputLine(String.format("%d", shooters.size()));
 	        for( Shooter shooter: shooters){
 	        	player.sendInputLine(String.format("%d %d %d %d %d %d %d",shooter.id, shooter.owner, (int)shooter.x, (int)shooter.y, (int)shooter.vx, (int)shooter.vy, shooter.hp));
 	        }
@@ -240,13 +258,23 @@ public class Referee extends AbstractReferee {
 	    for(Player player : gameManager.getPlayers()) {      
 	        player.execute();
 	        
+	        ArrayList<Shooter> ships = shooters.stream()
+	        		.filter(s->s.owner==player.getIndex())
+	        		.sorted(Comparator.comparing(s->s.id))
+	        		.collect(Collectors.toCollection(ArrayList<Shooter>::new));
+	        
+	        
 	        // Read outputs
 	        try {
-	            for(int i =0; i <player.getExpectedOutputLines();i++) {
+	        	int expextedOutPutLines = shooters.size()/2;
+	            for(int i =0; i <expextedOutPutLines;i++) {
 	            	String out = player.getOutputs().get(i);  
 	            	String[] output = out.split(";");
-	            	Shooter unit= shooters[player.getIndex()+2*i];
-	            	Shooter friend= shooters[player.getIndex()+2*(1-i)];
+	            	
+	            	Shooter unit= ships.get(i);
+	            	Shooter friend= unit;
+	            	
+	            	
 	            	if(!unit.isAlive())continue;
 		            //move commands
 		            String move = output[0];
@@ -299,7 +327,7 @@ public class Referee extends AbstractReferee {
 						if( msg.length()>15) {
 							msg = msg.substring(0,13)+"...";
 						}
-						shooters[player.getIndex()+2*i].message.setText(msg);
+						unit.message.setText(msg);
 					}
 	            }
 		       } catch (NumberFormatException e) {
@@ -326,22 +354,32 @@ public class Referee extends AbstractReferee {
 	private void checkWinner(int turn) {
 		boolean win0=false,win1 =false;
 		int winner = -1;
-		if(!shooters[0].isAlive() && !shooters[2].isAlive()){
+		
+		List<Shooter> team0 = shooters.stream()
+        		.filter(s->s.owner==0 && s.isAlive())
+        		.collect(Collectors.toList());
+		
+		List<Shooter> team1 = shooters.stream()
+				.filter(s->s.owner==0 && s.isAlive())
+				.collect(Collectors.toList());
+		
+		
+		if(team0.isEmpty()){
 			win1=true;winner = 1;
 		}
-		if(!shooters[1].isAlive() && !shooters[3].isAlive()){
+		if(team1.isEmpty()){
 			win0=true;winner = 0;
 		}
-		if( win0 && win1 ){
-			gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
-			gameManager.endGame();
-			return;
-		}
-		if(win1 || win0){
-			gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(winner).getNicknameToken() + " won!"));
-			gameManager.getPlayer(winner).setScore(1);
-			gameManager.endGame();
-		}
+//		if( win0 && win1 ){
+//			gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
+//			gameManager.endGame();
+//			return;
+//		}
+//		if(win1 || win0){
+//			gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(winner).getNicknameToken() + " won!"));
+//			gameManager.getPlayer(winner).setScore(1);
+//			gameManager.endGame();
+//		}
     }
 
     
@@ -349,20 +387,20 @@ public class Referee extends AbstractReferee {
     	gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
     	//tie breaker
     	int player0Hps = 0,player1Hps = 0;
-    	player0Hps+= shooters[0].isAlive()? shooters[0].hp : 0;
-    	player0Hps+= shooters[2].isAlive()? shooters[0].hp : 0;
-    	player1Hps+= shooters[1].isAlive()? shooters[1].hp : 0;
-    	player1Hps+= shooters[3].isAlive()? shooters[3].hp : 0;
-    	
-    	if(player0Hps>player1Hps){
-			gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(0).getNicknameToken() + " won on HP tie breaker!"));
-    	}
-    	if(player0Hps<player1Hps){
-    		gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(1).getNicknameToken() + " won on HP tie breaker!"));
-    	}
-    	if(player0Hps==player1Hps){
-    		gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
-    	}
+//    	player0Hps+= shooters[0].isAlive()? shooters[0].hp : 0;
+//    	player0Hps+= shooters[2].isAlive()? shooters[0].hp : 0;
+//    	player1Hps+= shooters[1].isAlive()? shooters[1].hp : 0;
+//    	player1Hps+= shooters[3].isAlive()? shooters[3].hp : 0;
+//    	
+//    	if(player0Hps>player1Hps){
+//			gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(0).getNicknameToken() + " won on HP tie breaker!"));
+//    	}
+//    	if(player0Hps<player1Hps){
+//    		gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(1).getNicknameToken() + " won on HP tie breaker!"));
+//    	}
+//    	if(player0Hps==player1Hps){
+//    		gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
+//    	}
     	
     	gameManager.endGame();
 	}
@@ -394,13 +432,10 @@ public class Referee extends AbstractReferee {
 		}
 	}
 
-	private void updateHpBars() {
-		//player1
-		hp11.setText(shooters[0].hp+"");
-		hp12.setText(shooters[2].hp+"");
-		//player2
-		hp21.setText(shooters[1].hp+"");
-		hp22.setText(shooters[3].hp+"");
+	private void updateHpCount() {
+		for(Shooter s: shooters){
+			s.hpText.setText(s.hp+"");
+		}
 	}
 
     private void updateSprites(Shooter p, double t) {
@@ -484,90 +519,83 @@ public class Referee extends AbstractReferee {
           
           
           for(int i = 0; i<Constants.NUMBER_OF_SHIPS ; i++) {
-	            
 	            //create units
-        	    shooters[player.getIndex()+2*i] = UnitFactory.createShooter(player.getIndex(), Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4,  Constants.HEIGHT/4*(4*i*player.getIndex()+3-2*i-2*player.getIndex()),  0,0);
- 
-	            //create hp bars
-        	    shooters[player.getIndex()+2*i].staticHealthBar = graphicEntityModule.createRectangle().setFillColor(0xE41515).setWidth(Constants.BASE_PLAYER_HP).setHeight(8)
-	            		.setY(110+i*50).setX(100 +(int)Constants.PLAYER_RADIUS + (player.getIndex() % 2) * Constants.WIDTH -Constants.BASE_PLAYER_HP*(player.getIndex() % 2)  - 200* (player.getIndex() % 2)-2*(player.getIndex() % 2)*((int)Constants.PLAYER_RADIUS) )
-	            		.setZIndex(100);
-        	    shooters[player.getIndex()+2*i].dynamicHealthBar = graphicEntityModule.createRectangle().setFillColor(0x00FF00).setWidth(Constants.BASE_PLAYER_HP).setHeight(8)
-	            		.setY(110+i*50).setX(100 +(int)Constants.PLAYER_RADIUS + (player.getIndex() % 2) * Constants.WIDTH -Constants.BASE_PLAYER_HP*(player.getIndex() % 2)  - 200* (player.getIndex() % 2)-2*(player.getIndex() % 2)*((int)Constants.PLAYER_RADIUS) )
-	            		.setZIndex(100);
-	            
-	            //create ship sprite
-	            Sprite s = graphicEntityModule.createSprite()
-				.setX(Constants.WIDTH/4 + 2*(player.getIndex())*Constants.WIDTH/4 )
-				.setY(Constants.HEIGHT/4*(4*i*player.getIndex()+3-2*i-2*player.getIndex()))
-	                    .setZIndex(20)
-	                    .setImage("alienspaceship.png")
-	                    .setScale(2*Constants.PLAYER_RADIUS/100)
-	                    .setAnchor(0.5);
-	            
-	            shooters[player.getIndex()+2*i].s=s;
-	            shooters[player.getIndex()+2*i].register(tooltipModule);
-	            
-	            
-	            //create message sprite for players
-	            String text = player.getIndex()==0 ? ":)" : ":(";
-	            Text msg = graphicEntityModule.createText(text)
-	                    .setX((int)shooters[player.getIndex()+2*i].x)
-	                    .setY((int)shooters[player.getIndex()+2*i].y - (int)Constants.PLAYER_RADIUS-10)
-	                    .setZIndex(500)
-	                    .setFontSize((int)(Constants.PLAYER_RADIUS/2))
-	                    .setFillColor(0xFFAC59)
-	                    .setAnchor(0.5);
-	            shooters[player.getIndex()+2*i].message=msg;
-	            
-	            
-	           //create circle around player's face
-	            Circle circle = graphicEntityModule.createCircle()
-	            .setX((int)shooters[player.getIndex()+2*i].x)
-	            .setY((int)shooters[player.getIndex()+2*i].y)
-	            .setRadius((int)(Constants.PLAYER_RADIUS -1))
-	            .setFillAlpha(0.15)
-	            .setFillColor(player.getColorToken())
-	            .setLineWidth(2)
-	            .setZIndex(20)
-	            .setLineColor(player.getColorToken()); 
-	            shooters[player.getIndex()+2*i].circle=circle;
+        	  	Shooter shooter = UnitFactory.createShooter(player.getIndex(),i);
+        	    shooters.add(shooter);
+        	    drawShooter(shooter,i);
+
           } 
       }
-      //set up hp counts
-      hp11 = graphicEntityModule.createText("100")
-      		.setX(165 +2*(int)Constants.PLAYER_RADIUS )
-      		.setY(100)
-              .setFontSize(30)
-              .setFillColor(gameManager.getPlayers().get(0).getColorToken())
-              .setAnchor(0);
-      
-      hp12 = graphicEntityModule.createText("100")
-      		.setX(165 +2*(int)Constants.PLAYER_RADIUS )
-      		.setY(150)
-      		.setFontSize(30)
-      		.setFillColor(gameManager.getPlayers().get(0).getColorToken())
-      		.setAnchor(0);
-      
-      hp21 = graphicEntityModule.createText("100")
-      		.setX(Constants.WIDTH - 220 - 2*(int)Constants.PLAYER_RADIUS)
-      		.setY(100)
-              .setFontSize(30)
-              .setFillColor(gameManager.getPlayers().get(1).getColorToken())
-              .setAnchor(0);
-      
-      hp22 = graphicEntityModule.createText("100")
-              	.setX(Constants.WIDTH - 220 - 2*(int)Constants.PLAYER_RADIUS)
-              	.setY(150)
-              	.setFontSize(30)
-              	.setFillColor(gameManager.getPlayers().get(1).getColorToken())
-              	.setAnchor(0);
               		
 	}
 
+	private void drawShooter(Shooter shooter,int nbr) {
+		int owner = shooter.owner;
+		int x = (int)shooter.x;
+		int y = (int)shooter.y;
+        //create hp bars
+	    shooter.staticHealthBar = graphicEntityModule.createRectangle().setFillColor(0xE41515).setWidth(Constants.BASE_PLAYER_HP).setHeight(8)
+        		.setY(110+nbr*50)
+        		.setX((int) (100 +Constants.PLAYER_RADIUS + owner*(Constants.WIDTH -Constants.BASE_PLAYER_HP   - 200 -2*Constants.PLAYER_RADIUS)) )
+        		.setZIndex(100);
+        		
+        		
+	    shooter.dynamicHealthBar = graphicEntityModule.createRectangle().setFillColor(0x00FF00).setWidth(Constants.BASE_PLAYER_HP).setHeight(8)
+        		.setY(110+nbr*50)
+        		.setX((int) (100 +Constants.PLAYER_RADIUS + owner*(Constants.WIDTH -Constants.BASE_PLAYER_HP   - 200 -2*Constants.PLAYER_RADIUS)) )
+        		.setZIndex(100);
+        
+        //create ship sprite
+        Sprite s = graphicEntityModule.createSprite()
+		.setX(x)
+		.setY(y)
+                .setZIndex(20)
+                .setImage("alienspaceship.png")
+                .setScale(2*Constants.PLAYER_RADIUS/100)
+                .setAnchor(0.5);
+        
+        shooter.s=s;
+        shooter.register(tooltipModule);
+        
+        
+        //create message sprite for players
+        String text = owner==0 ? "=]" : "=[";
+        Text msg = graphicEntityModule.createText(text)
+                .setX(x)
+                .setY(y- (int)Constants.PLAYER_RADIUS-10)
+                .setZIndex(500)
+                .setFontSize((int)(Constants.PLAYER_RADIUS/2))
+                .setFillColor(0xFFAC59)
+                .setAnchor(0.5);
+        shooter.message=msg;
+        
+        
+       //create circle around player's ship
+        int color = gameManager.getPlayer(owner).getColorToken();
+        Circle circle = graphicEntityModule.createCircle()
+        .setX((int)shooter.x)
+        .setY((int)shooter.y)
+        .setRadius((int)(Constants.PLAYER_RADIUS -1))
+        .setFillAlpha(0.15)
+        .setFillColor(color)
+        .setLineWidth(2)
+        .setZIndex(20)
+        .setLineColor(color); 
+        shooter.circle=circle;
+        
+        //set up hp count
+        shooter.hpText = graphicEntityModule.createText("100")
+        		.setX((int) (165 +2*Constants.PLAYER_RADIUS +owner*(Constants.WIDTH -385 - 4*Constants.PLAYER_RADIUS)))
+        		.setY(100+nbr*50)
+                .setFontSize(30)
+                .setFillColor(color)
+                .setAnchor(0);
+        
+	}
+
+
 	private void moveBackGround(int turn) {
     	vortex.s.setRotation(((turn+1)%4)*0.5*Math.PI);
-    	updateHpBars();
     	backGround.setAlpha(0.5+0.2*(turn%2));
 	}
 	
