@@ -242,6 +242,7 @@ public class Referee extends AbstractReferee {
 	private void sendInputs(int turn) {
     	for(Player player : gameManager.getPlayers()) {
     		player.setExpectedOutput(shooters.size()/2);
+    		System.err.println(" expected outlines :  "+shooters.size()/2);
     		//send ships inputs
     		player.sendInputLine(String.format("%d", shooters.size()));
 	        for( Shooter shooter: shooters){

@@ -14,8 +14,8 @@ public class Main {
         gameRunner.addAgent(Player1.class,"Automaton2000", avatarUrl1);
         
         String avatarUrl2 =  "https://static.codingame.com/servlet/fileservlet?id=21040051085748&format=navigation_avatar";
-//        gameRunner.addAgent(Player2.class,"WhatTrickeryIsThis", avatarUrl2);
-        gameRunner.addAgent(Player1.class,"WhatTrickeryIsThis", avatarUrl2);
+        gameRunner.addAgent(Player2.class,"WhatTrickeryIsThis", avatarUrl2);
+//        gameRunner.addAgent(Player1.class,"WhatTrickeryIsThis", avatarUrl2);
         
         // gameRunner.addAgent("python3 /home/user/player.py");
         

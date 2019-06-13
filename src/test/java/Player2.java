@@ -62,6 +62,7 @@ public class Player2 {
 
             	if(s.hp<=0){
             		System.out.println("WAIT");
+            		System.err.println("WAIT");
             		continue;
             	}
             	
@@ -70,28 +71,30 @@ public class Player2 {
             	int aimY=(int) s.y;
             	if(b!=null){
             		double a = angle(b,new Ball(b.x+b.vx,b.y+b.vy,0,0,0));
-            		aimX = (int)(s.x + 1000*Math.cos(a+(0.6*Math.PI)) ); 
+            		aimX = (int)(s.x + 1000*Math.cos(a+(0.6*Math.PI)) );
             		aimY = (int)(s.y + 1000*Math.sin(a+(0.6*Math.PI)) ); 
             	}
             	
             	Ship e = closestEnemyAlive(s);
+            	
             	if(e==null){
-            		System.err.println("WAIT");
             		System.out.println("WAIT");
+            		System.err.println("WAIT");
             		continue;
             	}
             	else{
-	            	if(turn%5==4){
-	            		System.out.println(String.format("MOVE %d %d;HEAL;HEAL",aimX , aimY));
-	            		continue;
-	            	}
-	            	
-	            	if(turn%5==3){
-	            		System.out.println(String.format("MOVE %d %d;SHOOT %d %d; Shoot "+e.x+" "+e.y,aimX , aimY,(int)s.x ,(int)s.y));
-	            		continue;
-	            	}           	
+//	            	if(turn%5==4){
+//	            		System.out.println(String.format("MOVE %d %d;HEAL;HEAL",aimX , aimY));
+//	            		continue;
+//	            	}
+//	            	
+//	            	if(turn%5==3){
+//	            		System.out.println(String.format("MOVE %d %d;SHOOT %d %d; Shoot "+e.x+" "+e.y,aimX , aimY,(int)s.x ,(int)s.y));
+//	            		continue;
+//	            	}           	
 	            	System.out.println(String.format("MOVE %d %d;SHOOT %d %d; Shoot "+e.x+" "+e.y,aimX , aimY,(int)e.x ,(int)e.y));
             	}
+            	
             }
              
              ships.clear();
