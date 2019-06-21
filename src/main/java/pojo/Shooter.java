@@ -49,6 +49,7 @@ public class Shooter extends Unit{
 	      .append("y : ").append((int)this.y).append("\n")
 	      .append("vx : ").append((int)this.vx).append("\n")
 	      .append("vy : ").append((int)this.vy).append("\n")
+	      .append("invul : ").append(this.invulTimer).append("\n")
 	      .append("Life : ").append(hp);
 	    
         tooltipModule.registerEntity(s, new HashMap<>());

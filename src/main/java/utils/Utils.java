@@ -111,15 +111,15 @@ public class Utils {
 				res = collisionMur;
 			}
 			
+			Collision vortexCollision = getCollision(u, Referee.vortex, t);
+			if( vortexCollision!=null && (res==null || vortexCollision.t < res.t)) {
+				res = vortexCollision;
+			}
+			
 			for(Unit other : units) {
 				
 				if(!other.isAlive() || other.equals(u))
 					continue;
-				
-				Collision vortexCollision = getCollision(u, Referee.vortex, t);
-				if( vortexCollision!=null && (res==null || vortexCollision.t < res.t)) {
-					res = vortexCollision;
-				}
 				
 				Collision collision = getCollision(u, other, t);
 				if( collision!=null && (res==null || collision.t < res.t)) {

@@ -21,10 +21,6 @@ public class Collision{
 	
 	public void apply() {
 		
-		if(u1 instanceof Vortex){//unit caught by the Vortex
-			u2.fallIntoVortex();
-			return;
-		}
 		if(u2 instanceof Vortex){//unit caught by the Vortex
 			u1.fallIntoVortex();
 			return;
@@ -43,7 +39,7 @@ public class Collision{
 		
 		if(u1 instanceof Bomb){//ball hits a unit
 			((Bomb)u1).explosion();
-			if(u2 instanceof Shooter) {
+			if(u2 instanceof Shooter &&  ((Shooter) u2).invulTimer<=0 ) {
 				((Shooter) u2).hp-=Constants.BOMB_DAMAGE;
 				((Shooter) u2).s.setImage("damaged.png");
 			}
@@ -55,7 +51,7 @@ public class Collision{
 		
 		if(u2 instanceof Bomb){//a unit hits a ball
 			((Bomb)u2).explosion();
-			if(u1 instanceof Shooter) {
+			if(u1 instanceof Shooter &&  ((Shooter) u1).invulTimer<=0 ) {
 				((Shooter) u1).hp-=Constants.BOMB_DAMAGE;
 				((Shooter) u1).s.setImage("Damaged.png");
 			}

@@ -29,7 +29,8 @@ public class Player2 {
             	int vx = scanner.nextInt();
             	int vy = scanner.nextInt();
             	int hp = scanner.nextInt();
-            	Ship s = new Ship(x,y,vx,vy,hp,owner);
+            	int invulTimer = scanner.nextInt();
+            	Ship s = new Ship(id,x,y,vx,vy,hp,owner);
             	System.err.println(s);
             	if(s.owner==myId){
             		ships.add(s);
@@ -54,16 +55,12 @@ public class Player2 {
             }
         	
             
-            System.err.println("i have "+ships.size());
-            
-            
-            
-            for(Ship s : ships){
+            forloop : for(Ship s : ships){
 
             	if(s.hp<=0){
             		System.out.println("WAIT");
             		System.err.println("WAIT");
-            		continue;
+            		continue forloop;
             	}
             	
             	Ball b = closestComingBall(s);
@@ -76,22 +73,23 @@ public class Player2 {
             	}
             	
             	Ship e = closestEnemyAlive(s);
-            	
+            	Ship f = closestfriendAlive(s);
+            	System.err.println("my friend is : "+f);
             	if(e==null){
             		System.out.println("WAIT");
             		System.err.println("WAIT");
-            		continue;
+            		continue forloop;
             	}
             	else{
-//	            	if(turn%5==4){
-//	            		System.out.println(String.format("MOVE %d %d;HEAL;HEAL",aimX , aimY));
-//	            		continue;
-//	            	}
-//	            	
-//	            	if(turn%5==3){
-//	            		System.out.println(String.format("MOVE %d %d;SHOOT %d %d; Shoot "+e.x+" "+e.y,aimX , aimY,(int)s.x ,(int)s.y));
-//	            		continue;
-//	            	}           	
+	            	if(turn%5==2 && f!=null){
+	            		System.out.println(String.format("MOVE %d %d;HEAL %d;HEAL",aimX , aimY, f.id));
+	            		continue;
+	            	}
+	            	
+	            	if(turn%5==3){
+	            		System.out.println(String.format("MOVE %d %d;SHOOT %d %d; Shoot "+e.x+" "+e.y,aimX , aimY,(int)s.x ,(int)s.y));
+	            		continue;
+	            	}           	
 	            	System.out.println(String.format("MOVE %d %d;SHOOT %d %d; Shoot "+e.x+" "+e.y,aimX , aimY,(int)e.x ,(int)e.y));
             	}
             	
@@ -104,6 +102,19 @@ public class Player2 {
         }
     }
     
+	private static Ship closestfriendAlive(Ship s) {
+		Ship res = null;
+		double min = 999999.;
+		for(Ship e : ships){
+			double d = dist(s,e);
+			if(d<min && e.hp>0 && s.id!=e.id){
+				min=d;
+				res = e;
+			}
+		}
+		return res;
+	}
+
 	public static double angle(Ball e1, Ball e2){//radian
         double dx = e2.x-e1.x;
         double dy = e2.y - e1.y;
@@ -160,8 +171,10 @@ class Ship{
 	double vy;
 	int hp;
 	int owner;
-	public Ship(double x, double y, double vx, double vy, int hp, int owner) {
+	int id;
+	public Ship(int id, double x, double y, double vx, double vy, int hp, int owner) {
 		super();
+		this.id=id;
 		this.x = x;
 		this.y = y;
 		this.vx = vx;

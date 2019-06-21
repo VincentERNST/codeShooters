@@ -1,6 +1,8 @@
 package pojo;
 
 import com.codingame.gameengine.module.entities.Sprite;
+
+import utils.Constants;
 import view.TooltipModule;
 
 public class Unit extends Point{
@@ -52,7 +54,12 @@ public class Unit extends Point{
 	}
 
 	public void fallIntoVortex() {
-		
+		System.err.println("OMG unimplemented vortex fall");
+		x=Constants.center.x;
+		y=Constants.center.y;
+		vx=0;
+		vy=0;
+		s.setScale(0.);
 	}
 	
     

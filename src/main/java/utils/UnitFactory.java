@@ -1,5 +1,7 @@
 package utils;
 
+import java.awt.Color;
+
 import pojo.Bomb;
 import pojo.Shooter;
 import pojo.Wall;
@@ -21,12 +23,11 @@ public class UnitFactory {
 		if(nbr>1){//extra shooters are coming from corners
 			if(owner==0){
 				toReturn =  new Shooter(shooterNbr++,owner, (int)(-Constants.PLAYER_RADIUS), (int)(-Constants.PLAYER_RADIUS), 200 ,200);
-				toReturn.invulTimer=Constants.INVUL_TIMER;
 			}
 			if(owner==1){
 				toReturn =  new Shooter(shooterNbr++,owner, (int)(Constants.WIDTH+Constants.PLAYER_RADIUS), (int)(Constants.HEIGHT+Constants.PLAYER_RADIUS), -200 ,-200);
-				toReturn.invulTimer=Constants.INVUL_TIMER;
 			}
+			toReturn.invulTimer=Constants.INVUL_TIMER;
 		}else{
 			int x = Constants.WIDTH/4 + owner*Constants.WIDTH/2;
 			int y = Constants.HEIGHT/4*(4*nbr*owner+3-2*nbr-2*owner);

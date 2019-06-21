@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import javax.swing.tree.ExpandVetoException;
+
 import com.codingame.gameengine.core.AbstractPlayer.TimeoutException;
 import com.codingame.gameengine.core.AbstractReferee;
 import com.codingame.gameengine.core.GameManager;
@@ -52,17 +54,13 @@ public class Referee extends AbstractReferee {
 
 	@Override
     public void gameTurn(int turn) {//turn from 0 to end
-    	
+		
 		//backGround graphical effects
 		moveBackGround(turn);
     	resetMessages();
 		
-    	System.err.println("turn "+turn);
-    	System.err.println(shooters.size()+"   ships ");
-    	
     	if(turn%20==0 && turn >0){//adds
-    		int nbr = 2+(int)turn/30;//nbr is the count of ships for a team
-    		System.err.println("adds nbr  "+nbr);
+    		int nbr = 1+(int)turn/20;//nbr is the count of ships for a team
     	  	Shooter addShooterTeam0 = UnitFactory.createShooter(0,nbr);
     	  	shooters.add(addShooterTeam0);
     	  	drawShooter(addShooterTeam0,nbr);
@@ -89,12 +87,13 @@ public class Referee extends AbstractReferee {
         computeAOE();
         computeDeaths();
         updateHpCount();
+        ticInvuls();
         
         // check winner
         checkWinner(turn);
         
         //check tie
-        if(turn > Constants.MAX_GAME_TURN) {
+        if(turn >= Constants.MAX_GAME_TURN) {
         	tieBreaker();
         }
         
@@ -126,7 +125,7 @@ public class Referee extends AbstractReferee {
 	private void computeAOE() {
 		//shooters get damaged
 		for(Shooter p : shooters) {
-			if(!p.isAlive())
+			if(!p.isAlive() || p.invulTimer>0)
 				continue;
 			boolean getHit = false;
 			for(Bomb b : bombs) {
@@ -172,9 +171,18 @@ public class Referee extends AbstractReferee {
 		}
 		
 	}
+	
+	
+	private void ticInvuls() {
+		for (Shooter s : shooters){
+			s.invulTimer--;
+			if(s.invulTimer==0){
+				s.circle.setLineColor(gameManager.getPlayer(s.owner).getColorToken()); 
+			}
+		}
+	}
 
 	private void computeTurn(List<Unit> units) {
-		
 		double t=0.0;
 		
     	while(t<1.0){
@@ -212,6 +220,7 @@ public class Referee extends AbstractReferee {
 			unit.move(duration);
 			if( unit instanceof Shooter) {
 				updateSprites((Shooter)unit,from+duration);
+				
 			}
 			else {
 		    	unit.s.setX((int) unit.x).setY((int) unit.y);
@@ -242,11 +251,10 @@ public class Referee extends AbstractReferee {
 	private void sendInputs(int turn) {
     	for(Player player : gameManager.getPlayers()) {
     		player.setExpectedOutput(shooters.size()/2);
-    		System.err.println(" expected outlines :  "+shooters.size()/2);
     		//send ships inputs
     		player.sendInputLine(String.format("%d", shooters.size()));
 	        for( Shooter shooter: shooters){
-	        	player.sendInputLine(String.format("%d %d %d %d %d %d %d",shooter.id, shooter.owner, (int)shooter.x, (int)shooter.y, (int)shooter.vx, (int)shooter.vy, shooter.hp));
+	        	player.sendInputLine(String.format("%d %d %d %d %d %d %d %d",shooter.id, shooter.owner, (int)shooter.x, (int)shooter.y, (int)shooter.vx, (int)shooter.vy, shooter.hp, shooter.invulTimer));
 	        }
 	        //send bombs inputs
 	        player.sendInputLine(String.format("%d", bombs.size()));
@@ -255,6 +263,7 @@ public class Referee extends AbstractReferee {
 	        }
     	}
 	}
+	
 
 	private void readOutPuts() {
 	    for(Player player : gameManager.getPlayers()) {      
@@ -268,14 +277,12 @@ public class Referee extends AbstractReferee {
 	        
 	        // Read outputs
 	        try {
-	        	int expextedOutPutLines = shooters.size()/2;
-	            for(int i =0; i <expextedOutPutLines;i++) {
+	        	int expectedOutPutLines = shooters.size()/2;
+	            for(int i =0; i <expectedOutPutLines;i++) {
 	            	String out = player.getOutputs().get(i);  
 	            	String[] output = out.split(";");
 	            	
 	            	Shooter unit= ships.get(i);
-	            	Shooter friend= unit;
-	            	
 	            	
 	            	if(!unit.isAlive())continue;
 		            //move commands
@@ -293,11 +300,12 @@ public class Referee extends AbstractReferee {
 						throw new Exception(" MOVE command is not properly set");
 					}      
 		            
-		            //shoot
-		            String shoot = output[1];
-					if (shoot.split(" ")[0].equals("SHOOT")) {
-						int targetShootX = Integer.parseInt(shoot.split(" ")[1]);
-						int targetShootY = Integer.parseInt(shoot.split(" ")[2]);
+		            //shoot command
+		            if(output.length<=1){continue;}
+		            String command = output[1];
+					if (command.split(" ")[0].equals("SHOOT")) {
+						int targetShootX = Integer.parseInt(command.split(" ")[1]);
+						int targetShootY = Integer.parseInt(command.split(" ")[2]);
 						if( targetShootX == unit.x && targetShootY == unit.y) {
 							gameManager.addToGameSummary(String.format("%s tried to shoot himself. Shoot is canceled.", player.getNicknameToken()));
 						}
@@ -310,9 +318,21 @@ public class Referee extends AbstractReferee {
 				            gameManager.addToGameSummary(String.format("Player %s played shoot (%d %d) ", player.getNicknameToken(), targetShootX, targetShootY));
 						}
 					}
-					else if (shoot.split(" ")[0].equals("HEAL")) {
+					//heal command
+					else if (command.split(" ")[0].equals("HEAL")) {
+						int friendId = Integer.parseInt(command.split(" ")[1]);
+						if(friendId<0 || friendId >=shooters.size() ){
+							throw new Exception(" Wrong id for heal command");
+						}
+						Shooter friend = shooters.get(friendId);
 						if(!friend.isAlive()){
-							gameManager.addToGameSummary(String.format("Player %s played HEAL without effect since ally is dead", player.getNicknameToken()));
+							gameManager.addToGameSummary(String.format("Player %s played HEAL without effect since target is dead", player.getNicknameToken()));
+						}
+						else if(friend.owner != unit.owner){
+							gameManager.addToGameSummary(String.format("Player %s played HEAL without effect, aiming wrong team", player.getNicknameToken()));
+						}
+						else if(friend.id == unit.id){
+							gameManager.addToGameSummary(String.format("Player %s played HEAL without effect, self-heal is not allowed", player.getNicknameToken()));
 						}
 						else{
 							friend.heal();
@@ -333,7 +353,7 @@ public class Referee extends AbstractReferee {
 					}
 	            }
 		       } catch (NumberFormatException e) {
-		           player.deactivate("Wrong output!");
+		           player.deactivate("Wrong output! Number is expected");
 		           player.setScore(-1);
 		           gameManager.endGame();
 		       } catch (TimeoutException e) {
@@ -343,7 +363,7 @@ public class Referee extends AbstractReferee {
 		           gameManager.endGame();
 		       }catch (Exception e) {
 		           gameManager.addToGameSummary(GameManager.formatErrorMessage(player.getNicknameToken() + e.getMessage()));
-		           player.deactivate(player.getNicknameToken() + " timeout!");
+		           player.deactivate(player.getNicknameToken() + " timeout!"+e.getMessage());
 		           player.setScore(-1);
 		           gameManager.endGame();
 		       }
@@ -362,7 +382,7 @@ public class Referee extends AbstractReferee {
         		.collect(Collectors.toList());
 		
 		List<Shooter> team1 = shooters.stream()
-				.filter(s->s.owner==0 && s.isAlive())
+				.filter(s->s.owner==1 && s.isAlive())
 				.collect(Collectors.toList());
 		
 		
@@ -372,37 +392,43 @@ public class Referee extends AbstractReferee {
 		if(team1.isEmpty()){
 			win0=true;winner = 0;
 		}
-//		if( win0 && win1 ){
-//			gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
-//			gameManager.endGame();
-//			return;
-//		}
-//		if(win1 || win0){
-//			gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(winner).getNicknameToken() + " won!"));
-//			gameManager.getPlayer(winner).setScore(1);
-//			gameManager.endGame();
-//		}
+		if( win0 && win1 ){
+			gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
+			gameManager.endGame();
+			return;
+		}
+		if(win1 || win0){
+			gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(winner).getNicknameToken() + " won!"));
+			gameManager.getPlayer(winner).setScore(1);
+			gameManager.endGame();
+		}
     }
 
     
     private void tieBreaker() {
     	gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
     	//tie breaker
-    	int player0Hps = 0,player1Hps = 0;
-//    	player0Hps+= shooters[0].isAlive()? shooters[0].hp : 0;
-//    	player0Hps+= shooters[2].isAlive()? shooters[0].hp : 0;
-//    	player1Hps+= shooters[1].isAlive()? shooters[1].hp : 0;
-//    	player1Hps+= shooters[3].isAlive()? shooters[3].hp : 0;
-//    	
-//    	if(player0Hps>player1Hps){
-//			gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(0).getNicknameToken() + " won on HP tie breaker!"));
-//    	}
-//    	if(player0Hps<player1Hps){
-//    		gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(1).getNicknameToken() + " won on HP tie breaker!"));
-//    	}
-//    	if(player0Hps==player1Hps){
-//    		gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
-//    	}
+		int score0 = shooters.stream()
+        		.filter(s->s.owner==0 && s.isAlive())
+        		.map(s->s.hp)
+        		.reduce(0, (a,b)-> a+b);
+		
+		int score1 = shooters.stream()
+				.filter(s->s.owner==1 && s.isAlive())
+				.map(s->s.hp)
+				.reduce(0, (a,b)-> a+b);
+		
+    	if(score0>score1){
+			gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(0).getNicknameToken() + " won on HP tie breaker!"));
+			gameManager.getPlayer(0).setScore(1);
+    	}
+    	if(score0<score1){
+    		gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(1).getNicknameToken() + " won on HP tie breaker!"));
+    		gameManager.getPlayer(1).setScore(1);
+    	}
+    	if(score0==score1){
+    		gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
+    	}
     	
     	gameManager.endGame();
 	}
@@ -446,7 +472,7 @@ public class Referee extends AbstractReferee {
 		p.message.setX((int) p.x).setY((int) p.y- (int)Constants.PLAYER_RADIUS-10);
 		p.circle.setX((int) p.x).setY((int) p.y);
 		graphicEntityModule.commitEntityState(t, p.s);
-//		graphicEntityModule.commitEntityState(t, p.message);//dont let comment go out of map
+//		graphicEntityModule.commitEntityState(t, p.message);// comment dont go out of map with this tricky commented line
 		graphicEntityModule.commitEntityState(t, p.circle);
 		
 		p.dynamicHealthBar.setScaleX(Math.min(1.0,Math.max(0,(double)Math.max(0,p.hp)/Constants.BASE_PLAYER_HP)) +t*Constants.EPSILON);//t factor allows to bypass unexpected interpolation
@@ -582,7 +608,7 @@ public class Referee extends AbstractReferee {
         .setFillColor(color)
         .setLineWidth(2)
         .setZIndex(20)
-        .setLineColor(color); 
+        .setLineColor(shooter.invulTimer>0 ? 0xFFFF00 : color); 
         shooter.circle=circle;
         
         //set up hp count

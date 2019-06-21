@@ -70,10 +70,12 @@
                 <p><strong>The Ships</strong><br>
                     <br>
                     Ships have a discs of radius <const>50</const>. They start at <const>100</const>HP. They move with a <const>200</const> thrust.<br> Ships can do actions : <br>
+				 <br>
+                    Every 20 turns. New ships come from corners. Having a <const>5</const> turn invulerability.
                     <ul>
                 <li><action>WAIT</action> <br></li>
                     <li><action>SHOOT x y</action>: Throw a Bomb from Ship position towards x y<br></li>
-                    <li><action>HEAL</action>: repair ally Ship for <const>5</const>HP<br></p></li>
+                    <li><action>HEAL id</action>: repair ally Ship of given id for <const>5</const>HP<br></p></li>
                     </ul>
 					<br>
 					
@@ -136,6 +138,21 @@
             </h1>
             <div class="statement-expert-rules-content">
                 <br>
+				
+                <p><strong>Game order of processing : </strong><br>
+ 
+                                <li>A New Ship are created every 20 turns. Starting with two each team.</li>
+							<li>Players outPuts are computed</li>
+                                <li>Bombs tic</li>
+							<li>Vortex applies his attraction</li>
+                                <li>Movements are resolved</li>
+							<li>AOE damage are resolved</li>
+							<li>Deaths are resolved</li>
+							<li>invulTimers tic</li>
+							<li>Check Winner / tie Break on total hp</li>
+ 
+<br><br>
+
 
                 <p><strong>Collisions</strong><br>
                     <br>
@@ -159,6 +176,7 @@
                    <br>Friction : <const>0.7</const>
                    <br>Radius : <const>50</const>
                    <br>Base HP : <const>100</const>
+				 <br>invulTimer : <const>5</const> for reinforcements ships
                    </p>
 <br><br>
 
@@ -221,7 +239,8 @@
                         <li>   <var>y</var></li>
                         <li>  <var>vx</var></li>
                         <li>  <var>vy</var></li>
-                        <li>   <var>health</var></li>
+                        <li>   <var>health</var></li> 
+					 <li>	<var>invulTimer</var> : Ship takes no damage whenever invulTimer > 0</li>
                     </ul>
                     <br> 
                     <span class="statement-lineno">Line <var>shipsNumber</var>+2  </span><var>bombsNumber</var> as Integer<br>
@@ -253,7 +272,7 @@
                     <strong>Action command</strong>
                     </br>
                     <ul>
-                        <li><action>HEAL</action></li>
+                        <li><action>HEAL Id</action></li>
                         <li><action>SHOOT x y</action></li>
                     </ul>
                     
@@ -262,8 +281,8 @@
                     Possible output commands :
                     <br>WAIT;
                    <br> MOVE X Y; SHOOT X Y;
-                    <br>MOVE X Y; HEAL;
-                   <br> MOVE X Y;HEAL; I Heal my friend
+                    <br>MOVE X Y; HEAL Id;
+                   <br> MOVE X Y;HEAL Id; I Heal my friend
                     <br><br>
                 </div>
             </div>

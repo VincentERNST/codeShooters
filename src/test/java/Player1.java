@@ -22,6 +22,7 @@ public class Player1 {
             	int vx = scanner.nextInt();
             	int vy = scanner.nextInt();
             	int hp = scanner.nextInt();
+            	int invulTimer = scanner.nextInt();
             }           
             
             
@@ -50,9 +51,16 @@ public class Player1 {
                 }
         		continue whileloop;
         	}
+//         	if(turn < 15){
+//                for(int i=0;i<m;i++){
+//                	System.out.println("WAIT;");
+//                }
+//        		continue whileloop;
+//        	}
+         	
         	if(turn%5 == 3){
                 for(int i=0;i<m;i++){
-                	System.out.println("MOVE 774 61;HEAL");
+                	System.out.println("MOVE 774 61;HEAL 0");
                 }
         		continue whileloop;
         	}
