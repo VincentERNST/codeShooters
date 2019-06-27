@@ -19,10 +19,13 @@ public class Bomb extends Unit{
 	}
 	
 	public void explosion() {
-		s.setImage("explosion2.png").setScale(2*Constants.EXPLOSION_RADIUS/100).setZIndex(3);
+		s.setImage("explosion2.png");
 		vx=0.;
 		vy=0.;
 		this.tic=0;
+	}
+	public void expand() {
+		s.setScale(2*Constants.EXPLOSION_RADIUS/100).setZIndex(3);
 	}
 	
 	public void fade() {
