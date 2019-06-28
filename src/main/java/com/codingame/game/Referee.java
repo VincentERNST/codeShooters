@@ -185,13 +185,15 @@ public class Referee extends AbstractReferee {
 	}
 
 	private void computeTurn(List<Unit> units) {
+		System.err.println("   ---------   ");
 		double t=0.0;
 		
     	while(t<1.0){
     		
     		Collision c = Utils.getFirstCollisionFrom(units,t);
-    		
+    		System.err.println("time  :   "+t);
     		if( c!=null && c.t>=t){
+    			System.err.println("collision " +c.u1.id+"   "+c.u2.id);
     			moveAll(units, t,  c.t-t);
     			c.apply();
     			t= c.t;
@@ -200,11 +202,12 @@ public class Referee extends AbstractReferee {
     			moveAll(units,t, 1-t);
     			t=1;
     		}
+    		commitAll(units,t);
     		
     	}
     	
     	endAll(units);
-    	commitAll(1.0,units);
+//    	commitAll(1.0,units);
 	}
 
     private void endAll(List<Unit> units) {
@@ -220,16 +223,31 @@ public class Referee extends AbstractReferee {
 	private void moveAll(List<Unit> units,  double from, double duration) {
 		for(Unit unit : units) {
 			unit.move(duration);
+			//TODO replacing moveall -> commitAll
+//			if( unit instanceof Shooter) {
+//				updateSprites((Shooter)unit,from+duration);
+//				
+//			}
+//			else {
+//		    	unit.s.setX((int) unit.x).setY((int) unit.y);
+//		    	graphicEntityModule.commitEntityState(from+duration, unit.s);
+//			}
+		}
+	}
+
+	private void commitAll(List<Unit> units,  double t) {
+		for(Unit unit : units) {
 			if( unit instanceof Shooter) {
-				updateSprites((Shooter)unit,from+duration);
+				updateSprites((Shooter)unit,t);
 				
 			}
 			else {
 		    	unit.s.setX((int) unit.x).setY((int) unit.y);
-		    	graphicEntityModule.commitEntityState(from+duration, unit.s);
+		    	graphicEntityModule.commitEntityState(t, unit.s);
 			}
 		}
 	}
+	
  
 	
  

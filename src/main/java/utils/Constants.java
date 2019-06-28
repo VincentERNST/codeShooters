@@ -12,7 +12,8 @@ public final class Constants {
 	public static int HEIGHT = 1080;
 	public static int HORIZONTAL = 0;
 	public static int VERTICAL = 1;
-	public static double EPSILON = 0.00001;
+//	public static double EPSILON = 0.00001;
+	public static double EPSILON = 0.;
 	public static int BOMB_POOL_SIZE = 36;
 	
 	public static int BASE_PLAYER_HP = 100;
