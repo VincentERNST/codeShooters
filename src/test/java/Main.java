@@ -1,4 +1,7 @@
-import com.codingame.gameengine.runner.GameRunner;
+import com.codingame.gameengine.core.AbstractPlayer;
+import com.codingame.gameengine.core.GameManager;
+//import com.codingame.gameengine.runner.GameRunner;
+import com.codingame.gameengine.runner.MultiplayerGameRunner;
 
 public class Main {
 	
@@ -7,12 +10,8 @@ public class Main {
 	
     public static void main(String[] args) {
     	
+        MultiplayerGameRunner gameRunner = new MultiplayerGameRunner();
     	
-    	
-    	
-
-        
-        GameRunner gameRunner = new GameRunner();
         
         String avatarUrl1 = "https://static.codingame.com/servlet/fileservlet?id=10860609425191&format=navigation_avatar";
         gameRunner.addAgent(Player2.class,"Automaton2000", avatarUrl1);

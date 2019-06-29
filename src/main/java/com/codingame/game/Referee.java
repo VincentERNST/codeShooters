@@ -12,7 +12,9 @@ import javax.swing.tree.ExpandVetoException;
 import com.codingame.gameengine.core.AbstractPlayer.TimeoutException;
 import com.codingame.gameengine.core.AbstractReferee;
 import com.codingame.gameengine.core.GameManager;
+import com.codingame.gameengine.core.MultiplayerGameManager;
 import com.codingame.gameengine.core.Tooltip;
+import com.codingame.gameengine.module.endscreen.EndScreenModule;
 import com.codingame.gameengine.module.entities.Circle;
 import com.codingame.gameengine.module.entities.GraphicEntityModule;
 import com.codingame.gameengine.module.entities.Sprite;
@@ -31,8 +33,9 @@ import view.TooltipModule;
 
 public class Referee extends AbstractReferee {
 	
-    @Inject private GameManager<Player> gameManager;
+	@Inject private MultiplayerGameManager<Player> gameManager;
     @Inject private GraphicEntityModule graphicEntityModule;
+    @Inject private EndScreenModule endScreenModule;
     private List<Bomb> bombs = new ArrayList<Bomb>();
 //    private Shooter[] shooters = new Shooter[Constants.NUMBER_OF_PLAYERS * Constants.NUMBER_OF_SHIPS];
     private ArrayList<Shooter> shooters = new ArrayList<Shooter>();
@@ -42,13 +45,10 @@ public class Referee extends AbstractReferee {
     public static Vortex vortex= new Vortex(-11, Constants.WIDTH/2, Constants.HEIGHT/2,Constants.VORTEX_RADIUS);
     
     @Override
-    public Properties init(Properties params) {
-    	
+    public void init( ) {
     	tooltipModule = new TooltipModule(gameManager);
         gameManager.setFrameDuration(500);
-        
         initGraphics();
-        return params;
     }
 
 
@@ -165,7 +165,9 @@ public class Referee extends AbstractReferee {
 			b.tic--;
 			if(b.tic==0){
 				b.explosion();
-				graphicEntityModule.commitEntityState(0.5,b.s);
+				graphicEntityModule.commitEntityState(0,b.s);
+				b.expand();
+				graphicEntityModule.commitEntityState(1,b.s);
 				continue;
 			}
 		}
@@ -177,19 +179,21 @@ public class Referee extends AbstractReferee {
 		for (Shooter s : shooters){
 			s.invulTimer--;
 			if(s.invulTimer==0){
-				s.circle.setLineColor(gameManager.getPlayer(s.owner).getColorToken()); 
+				s.circle.setLineColor(gameManager.getPlayer(s.owner).getColorToken());
 			}
 		}
 	}
 
 	private void computeTurn(List<Unit> units) {
+		System.err.println("   ---------   ");
 		double t=0.0;
 		
     	while(t<1.0){
     		
     		Collision c = Utils.getFirstCollisionFrom(units,t);
-    		
+    		System.err.println("time  :   "+t);
     		if( c!=null && c.t>=t){
+    			System.err.println("collision " +c.u1.id+"   "+c.u2.id);
     			moveAll(units, t,  c.t-t);
     			c.apply();
     			t= c.t;
@@ -198,11 +202,12 @@ public class Referee extends AbstractReferee {
     			moveAll(units,t, 1-t);
     			t=1;
     		}
+    		commitAll(units,t);
     		
     	}
     	
     	endAll(units);
-    	commitAll(1.0,units);
+//    	commitAll(1.0,units);
 	}
 
     private void endAll(List<Unit> units) {
@@ -218,16 +223,31 @@ public class Referee extends AbstractReferee {
 	private void moveAll(List<Unit> units,  double from, double duration) {
 		for(Unit unit : units) {
 			unit.move(duration);
+			//TODO replacing moveall -> commitAll
+//			if( unit instanceof Shooter) {
+//				updateSprites((Shooter)unit,from+duration);
+//				
+//			}
+//			else {
+//		    	unit.s.setX((int) unit.x).setY((int) unit.y);
+//		    	graphicEntityModule.commitEntityState(from+duration, unit.s);
+//			}
+		}
+	}
+
+	private void commitAll(List<Unit> units,  double t) {
+		for(Unit unit : units) {
 			if( unit instanceof Shooter) {
-				updateSprites((Shooter)unit,from+duration);
+				updateSprites((Shooter)unit,t);
 				
 			}
 			else {
 		    	unit.s.setX((int) unit.x).setY((int) unit.y);
-		    	graphicEntityModule.commitEntityState(from+duration, unit.s);
+		    	graphicEntityModule.commitEntityState(t, unit.s);
 			}
 		}
 	}
+	
  
 	
  
@@ -399,6 +419,7 @@ public class Referee extends AbstractReferee {
 		}
 		if(win1 || win0){
 			gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(winner).getNicknameToken() + " won!"));
+			gameManager.addTooltip(new Tooltip(winner ,   gameManager.getPlayer(winner).getNicknameToken()+" Wins"));
 			gameManager.getPlayer(winner).setScore(1);
 			gameManager.endGame();
 		}
@@ -420,11 +441,11 @@ public class Referee extends AbstractReferee {
 		
     	if(score0>score1){
 			gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(0).getNicknameToken() + " won on HP tie breaker!"));
-			gameManager.getPlayer(0).setScore(1);
+			gameManager.getPlayer(0).setScore(score0);
     	}
     	if(score0<score1){
     		gameManager.addToGameSummary(GameManager.formatSuccessMessage(gameManager.getPlayer(1).getNicknameToken() + " won on HP tie breaker!"));
-    		gameManager.getPlayer(1).setScore(1);
+    		gameManager.getPlayer(1).setScore(score1);
     	}
     	if(score0==score1){
     		gameManager.addToGameSummary(GameManager.formatSuccessMessage(" Tie "));
@@ -480,6 +501,7 @@ public class Referee extends AbstractReferee {
 	}
     
 	
+    
 	private void draw(Bomb b, Point target) {
 		if(b.s==null) {
 	        b.s=graphicEntityModule.createSprite();
@@ -494,7 +516,6 @@ public class Referee extends AbstractReferee {
   	  backGround = graphicEntityModule.createSprite()
               .setImage("Omega_Centauri.jpg")
               .setAnchor(0);
-      
   	  
   	  //create Vortex sprite
   	  vortex.s = graphicEntityModule.createSprite()
@@ -504,6 +525,7 @@ public class Referee extends AbstractReferee {
   				.setScale(2*Constants.VORTEX_RADIUS/100)
   				.setAnchor(0.5)
   				.setZIndex(1);
+  	  
   	  //vortex center
 	  	graphicEntityModule.createSprite()
 		    .setImage("BlackHoleBlue.png")
@@ -512,7 +534,6 @@ public class Referee extends AbstractReferee {
 			.setScale(2*Constants.VORTEX_RADIUS/300)
 			.setAnchor(0.5)
 			.setZIndex(1);
-  	  
   	  
   	  for (Player player : gameManager.getPlayers()) {
     	  //send player id
@@ -534,7 +555,11 @@ public class Referee extends AbstractReferee {
                   .setZIndex(100)
                   .setScale(2*Constants.PLAYER_RADIUS/100)
                   .setImage(player.getAvatarToken())
+//                  .setImage(player.getNicknameToken())
                   .setAnchor(0.5);
+          
+          
+          System.err.println(player.getAvatarToken());
           
           //Encircle face
           graphicEntityModule.createCircle()
@@ -634,5 +659,10 @@ public class Referee extends AbstractReferee {
 			}
 		}
 	}
+	
+	  @Override
+	  public void onEnd() {
+	    endScreenModule.setScores(gameManager.getPlayers().stream().mapToInt(p -> p.getScore()).toArray());
+	  }
 
 }
