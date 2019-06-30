@@ -4,7 +4,9 @@ import java.util.List;
 
 import com.codingame.game.Referee;
 
+import pojo.Bomb;
 import pojo.Point;
+import pojo.Shooter;
 import pojo.Unit;
 
 public class Utils {
@@ -76,9 +78,11 @@ public class Utils {
 	
 	public static Collision getCollision(Unit unit, Unit other, double from) {
 
-		System.err.println(unit.id+" <-> "+other.id);
 		double r2 = unit.r+other.r;
-		if(distance2(unit , other)<r2*r2){return null;}
+		if(distance2(unit , other)<=r2*r2){//instant collision exepts First turn for Bombs
+			if( lunchingBomb(unit,other) ){return null;}
+			return new Collision(unit, other,from);
+		}
 		double x2 = unit.x - other.x;
 		double y2 = unit.y - other.y;
 		double vx2 = unit.vx - other.vx;
@@ -92,9 +96,6 @@ public class Utils {
 		if (delta < 0.0) return null;
 		
 		double t =  (-b - Math.sqrt(delta)) / (2.0 * a);
-		
-		System.err.println("time " +t);
-		
 		if(t<0.0) return null;
 		t+=from;
 		if(t>1.0)  return null;
@@ -103,6 +104,16 @@ public class Utils {
 	}
 	
 	
+	private static boolean lunchingBomb(Unit unit, Unit other) {
+		if(unit instanceof Bomb  && other instanceof Shooter){
+			return ((Bomb)unit).tic==Constants.BOMB_TIC-1;
+		}
+		if(other instanceof Bomb  && unit instanceof Shooter){
+			return ((Bomb)other).tic==Constants.BOMB_TIC-1;
+		}
+		return false;
+	}
+
 	public static Collision getFirstCollisionFrom(List<Unit> units, double t) {
 		Collision res = null;
 		for(Unit u : units) {
@@ -126,13 +137,10 @@ public class Utils {
 					continue;
 				
 				Collision collision = getCollision(u, other, t);
-				
-				if(collision!=null) {
-					System.err.println("we have candidate collision "+collision.t+ " "+collision.u1.id+" " +collision.u2);
-				}
 				if( collision!=null && (res==null || collision.t < res.t)) {
 					res = collision;
 				}
+				
 			}
 		}
 		return res;

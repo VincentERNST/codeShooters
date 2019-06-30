@@ -70,6 +70,7 @@ public class Shooter extends Unit{
 		vy=0;
 		s.setScale(0.);
 		circle.setScale(0.);
+		message.setScale(0.);
 		hp=0;
 	}
 	

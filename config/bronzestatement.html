@@ -59,7 +59,7 @@
                 <p>During a turn, each Ship is supposed to move and either apply a shoot or a repair.</p>
                 <!-- END -->
                 
-                <p>The Bombs have a <const>6</const> turns timer. They hit for <const>10</const> damage on direct collision, and  <const>2</const> on area of effect damage.</p>
+                <p>The Bombs have a <const>6</const> turns timer.They are lucnched from Ship center and may explode if they stand in the its radius more than one turn. They hit for <const>10</const> damage on direct collision, and  <const>2</const> on area of effect damage.</p>
                 <p>The Repair heals for <const>5</const> HP. It applies on ally Ship.</p>
 
  				<!-- BEGIN  bronze-->
@@ -189,7 +189,7 @@
                    <br>Explosion radius : <const>150</const>
                    <br>Impact Damage: <const>10</const>
                    <br>Area of effect damage : <const>10</const>
-                   <br>Bombs aquire the speed of their luncher, plus shooter thrust. Whenever Bombs explode, their speed is set to zero.
+                   <br>Bombs aquire the speed of their luncher, plus shooter thrust. You have one turn to let the Bomb out of the Ship radius, explosion occurs otherwise. Whenever Bombs explode, their speed is set to zero.
                    </p>
 <br><br>
 

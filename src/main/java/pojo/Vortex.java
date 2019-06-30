@@ -30,20 +30,4 @@ public class Vortex extends Unit{
 		return true;
 	}
 	
-	public void swallow(Unit u) {
-		
-		System.err.println(u.getClass());
-		System.err.println(u.equals(this));
-		u.s.setX((int)Constants.center.x);
-		u.s.setY((int)Constants.center.y);
-		
-		if(u instanceof Bomb) {
-			((Bomb)u).tic=-2;
-			
-		}
-		if(u instanceof Shooter) {
-			((Shooter)u).hp=0;
-		}
-	}
-	
 }

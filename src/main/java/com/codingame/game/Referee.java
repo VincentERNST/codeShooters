@@ -16,6 +16,7 @@ import com.codingame.gameengine.core.MultiplayerGameManager;
 import com.codingame.gameengine.core.Tooltip;
 import com.codingame.gameengine.module.endscreen.EndScreenModule;
 import com.codingame.gameengine.module.entities.Circle;
+import com.codingame.gameengine.module.entities.Curve;
 import com.codingame.gameengine.module.entities.GraphicEntityModule;
 import com.codingame.gameengine.module.entities.Sprite;
 import com.codingame.gameengine.module.entities.Text;
@@ -77,8 +78,8 @@ public class Referee extends AbstractReferee {
 	    
         //compute turn
     	List<Unit> units = new ArrayList<Unit>();
-    	units.addAll(shooters);
-    	units.addAll(bombs);
+    	units.addAll(shooters.stream().filter(s->s.isAlive()).collect(Collectors.toList()));
+    	units.addAll(bombs.stream().filter(s->s.isAlive()).collect(Collectors.toList()));
     	
 	    ticBullets();
 		vortex.attract(units);
@@ -185,41 +186,45 @@ public class Referee extends AbstractReferee {
 	}
 
 	private void computeTurn(List<Unit> units) {
-		System.err.println("   ---------   ");
 		double t=0.0;
-		
     	while(t<1.0){
     		
     		Collision c = Utils.getFirstCollisionFrom(units,t);
-    		System.err.println("time  :   "+t);
     		if( c!=null && c.t>=t){
-    			System.err.println("collision " +c.u1.id+"   "+c.u2.id);
     			moveAll(units, t,  c.t-t);
     			c.apply();
     			t= c.t;
+    			commit(c.u1,t);
+    			commit(c.u2,t);
     		}
     		if(c==null){
     			moveAll(units,t, 1-t);
     			t=1;
     		}
-    		commitAll(units,t);
     		
     	}
     	
     	endAll(units);
-//    	commitAll(1.0,units);
+    	commitAll(1.0,units);
 	}
 
+	
+	
     private void endAll(List<Unit> units) {
 		for(Unit unit : units) {
 			if(unit.isAlive()) {
 				unit.end();
 			}
 			unit.register(tooltipModule);
+			if(unit instanceof Bomb && ((Bomb) unit).tic==0){
+				((Bomb)unit).expand();
+				graphicEntityModule.commitEntityState(1, unit.s);
+			}
 		}
 	}
 
 
+    
 	private void moveAll(List<Unit> units,  double from, double duration) {
 		for(Unit unit : units) {
 			unit.move(duration);
@@ -235,11 +240,12 @@ public class Referee extends AbstractReferee {
 		}
 	}
 
-	private void commitAll(List<Unit> units,  double t) {
+	
+	
+	private void commitAll(double t, List<Unit> units ) {
 		for(Unit unit : units) {
 			if( unit instanceof Shooter) {
 				updateSprites((Shooter)unit,t);
-				
 			}
 			else {
 		    	unit.s.setX((int) unit.x).setY((int) unit.y);
@@ -247,8 +253,16 @@ public class Referee extends AbstractReferee {
 			}
 		}
 	}
-	
- 
+
+	private void commit(Unit unit,  double t) {
+			if( unit instanceof Shooter) {
+				updateSprites((Shooter)unit,t);
+			}
+			else if( unit instanceof Bomb) {
+		    	unit.s.setX((int) unit.x).setY((int) unit.y);
+		    	graphicEntityModule.commitEntityState(t, unit.s);
+			}
+	}
 	
  
 /** 						* *	* 								**
@@ -473,13 +487,13 @@ public class Referee extends AbstractReferee {
 	
 
 
-	private void commitAll(double t, List<Unit> units) {
-		for(Unit unit : units) {
-			if(!unit.isAlive())
-				continue;
-			graphicEntityModule.commitEntityState(t, unit.s);
-		}
-	}
+//	private void commitAll(double t, List<Unit> units) {
+//		for(Unit unit : units) {
+//			if(!unit.isAlive())
+//				continue;
+//			graphicEntityModule.commitEntityState(t, unit.s);
+//		}
+//	}
 
 	private void updateHpCount() {
 		for(Shooter s: shooters){
@@ -555,11 +569,7 @@ public class Referee extends AbstractReferee {
                   .setZIndex(100)
                   .setScale(2*Constants.PLAYER_RADIUS/100)
                   .setImage(player.getAvatarToken())
-//                  .setImage(player.getNicknameToken())
                   .setAnchor(0.5);
-          
-          
-          System.err.println(player.getAvatarToken());
           
           //Encircle face
           graphicEntityModule.createCircle()
@@ -568,6 +578,7 @@ public class Referee extends AbstractReferee {
 	            .setRadius((int)(0.5*(Math.sqrt(2))*Constants.PLAYER_RADIUS -1))
 	            .setLineWidth(2)
 	            .setZIndex(100)
+	            .setFillAlpha(0.0, Curve.LINEAR)
 	            .setLineColor(player.getColorToken());
           
           
